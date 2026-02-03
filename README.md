@@ -6,8 +6,11 @@ A web-based task management tool with Gantt chart visualization, built for FTC m
 
 - 🔐 **Authentication**: Email/Password authentication via Firebase
 - 📊 **User-Grouped Gantt Chart**: Interactive Gantt chart with tasks grouped by user vertically
-- 🎯 **Modal Task Creation**: Quick and easy task creation via modal dialog
+- 🎯 **Next Up Panel**: Intelligent display of the next ready-to-start task
+- 🔗 **Task Dependencies**: Define and visualize task relationships and prerequisites
 - 📝 **Task Management**: Create, edit, and delete tasks with full CRUD operations
+- 🚦 **Smart Status Indicators**: Visual badges showing blocked/ready task states
+- 📈 **Dependency Visualization**: Clear display of task relationships and impact chains
 - 👥 **Multi-user Access**: All authenticated users can read and write tasks
 - 👤 **User Assignment**: Assign tasks to users with optional secondary assignees
 - 🔄 **Real-time Updates**: Automatic synchronization across all users
@@ -158,9 +161,45 @@ https://hisaki-akira.github.io/TaskManage/
    - **End Date**: When the task should be completed (required)
    - **Status**: Current task status
    - **Description**: Additional details about the task
+   - **Dependencies**: Select tasks that must be completed before this one (optional, multi-select with Ctrl/Cmd + Click)
 
 3. Click "Create Task" to add the task
 4. The modal will close automatically upon successful creation
+
+### Understanding the Next Up Panel
+
+The **Next Up Panel** appears at the top of the main content area and intelligently shows you the next task to work on:
+
+- **Smart Filtering**: Only shows tasks that are:
+  - Not completed or on hold
+  - Have all dependencies completed (ready to start)
+  - Should have started (start date is today or in the past)
+  
+- **Dismissible**: Click the × button to hide it if you prefer
+- **Auto-updates**: Refreshes automatically as you complete tasks
+
+### Managing Dependencies
+
+**Creating Dependencies:**
+- When creating/editing a task, use the "Dependencies" multi-select field
+- Hold Ctrl (Windows/Linux) or Cmd (Mac) to select multiple tasks
+- The system prevents circular dependencies automatically
+
+**Understanding Task States:**
+- **Ready** (green badge): All dependencies completed, ready to start
+- **Blocked** (red badge): Has incomplete dependencies, cannot start yet
+- No badge: Either has no dependencies or is already completed/on hold
+
+**Viewing Dependencies:**
+- In **Gantt Chart**: Click any task bar to see a popup with:
+  - Tasks this depends on (with their status)
+  - Tasks that are blocked by this one
+  - Visual badge indicating if task is blocked or ready
+  
+- In **List View**: Each task card shows:
+  - Complete list of dependency tasks
+  - Which tasks this one blocks
+  - Ready/Blocked status badge
 
 ### Viewing Tasks
 

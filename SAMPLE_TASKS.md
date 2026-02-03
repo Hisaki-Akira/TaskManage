@@ -11,6 +11,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **Start Date**: 2026-02-03
 - **End Date**: 2026-02-03
 - **Status**: Completed
+- **Dependencies**: None
 - **Description**: Initial meeting to discuss project goals, timeline, and team responsibilities.
 
 ### Task 2: Requirements Gathering
@@ -20,6 +21,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **Start Date**: 2026-02-04
 - **End Date**: 2026-02-10
 - **Status**: In Progress
+- **Dependencies**: Task 1 (Project Kickoff Meeting)
 - **Description**: Meet with stakeholders to collect and document all project requirements.
 
 ### Task 3: Design Phase
@@ -29,6 +31,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **Start Date**: 2026-02-11
 - **End Date**: 2026-02-17
 - **Status**: Not Started
+- **Dependencies**: Task 2 (Gather Project Requirements)
 - **Description**: Design the system architecture, database schema, and API endpoints.
 
 ### Task 4: Frontend Development
@@ -38,6 +41,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **Start Date**: 2026-02-18
 - **End Date**: 2026-02-28
 - **Status**: Not Started
+- **Dependencies**: Task 3 (Create System Design)
 - **Description**: Build responsive UI components and integrate with backend APIs.
 
 ### Task 5: Backend Development
@@ -47,6 +51,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **Start Date**: 2026-02-18
 - **End Date**: 2026-02-28
 - **Status**: Not Started
+- **Dependencies**: Task 3 (Create System Design)
 - **Description**: Develop RESTful APIs, database integration, and business logic.
 
 ### Task 6: Testing
@@ -56,6 +61,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **Start Date**: 2026-03-01
 - **End Date**: 2026-03-07
 - **Status**: Not Started
+- **Dependencies**: Task 4 (Develop User Interface), Task 5 (Build Backend APIs)
 - **Description**: Perform unit testing, integration testing, and user acceptance testing.
 
 ### Task 7: Documentation
@@ -65,6 +71,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **Start Date**: 2026-03-01
 - **End Date**: 2026-03-05
 - **Status**: Not Started
+- **Dependencies**: Task 4 (Develop User Interface)
 - **Description**: Create user guides, API documentation, and deployment instructions.
 
 ### Task 8: Deployment
@@ -74,6 +81,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **Start Date**: 2026-03-08
 - **End Date**: 2026-03-08
 - **Status**: Not Started
+- **Dependencies**: Task 6 (Quality Assurance Testing), Task 7 (Write User Documentation)
 - **Description**: Deploy application to production environment and configure monitoring.
 
 ## Task Data Structure
@@ -89,10 +97,24 @@ Each task in Firestore has the following structure:
   endDate: "2026-02-10",           // String (YYYY-MM-DD), required
   status: "In Progress",            // String, one of: "Not Started", "In Progress", "Completed", "On Hold"
   description: "Task details...",   // String, optional
+  dependencies: ["taskId1", "taskId2"],  // Array of task IDs, optional - Tasks that must complete first
   createdAt: Timestamp,             // Firebase Timestamp, auto-generated
   updatedAt: Timestamp              // Firebase Timestamp, auto-updated
 }
 ```
+
+### Understanding Dependencies
+
+The `dependencies` field is an array of task IDs that must be completed before this task can start:
+- **Empty array or undefined**: Task has no dependencies and can start anytime
+- **Contains task IDs**: Task is blocked until all referenced tasks are completed
+- **Circular dependencies**: System prevents you from creating circular dependency chains
+
+### Task States Based on Dependencies
+
+1. **Ready** - All dependencies completed, can start immediately
+2. **Blocked** - Has one or more incomplete dependencies
+3. **No Dependencies** - Can start anytime (no prerequisites)
 
 ### User Name vs Assignee
 
@@ -162,20 +184,60 @@ To test the application, create these tasks in order:
 
 This gives you a good mix to visualize in the Gantt chart.
 
-## Example Gantt Chart Timeline
+## Dependency Examples
+
+### Linear Dependency Chain
+```
+Task A (Completed) 
+  → Task B (In Progress) 
+    → Task C (Not Started, Blocked)
+      → Task D (Not Started, Blocked)
+```
+In this chain:
+- Task B can be worked on (dependency A is complete)
+- Task C is blocked (waiting for B)
+- Task D is blocked (waiting for C)
+
+### Parallel Dependencies
+```
+Task A (Completed)
+  → Task B (In Progress)
+  → Task C (Not Started, Ready)
+  
+Task B + Task C 
+  → Task D (Not Started, Blocked)
+```
+In this structure:
+- Both B and C can be worked on simultaneously (A is complete)
+- Task D requires both B and C to complete first
+
+### Multiple Prerequisites
+```
+Task A (Completed) → \
+Task B (Completed) →  → Task D (Not Started, Ready)
+Task C (In Progress) → /
+```
+Task D depends on A, B, and C:
+- Currently blocked because C is not yet complete
+- Will become "Ready" once C is marked as completed
+
+## Example Gantt Chart Timeline with Dependencies
 
 ```
 Feb  |  Mar  |  Apr
 -----|-------|------
-[Kickoff]
-    [Requirements]
-          [Design]
-                [Frontend Dev]
-                [Backend Dev]
-                      [Testing]
-                      [Docs]
-                            [Deploy]
+[Kickoff] ✓
+    [Requirements] (Blocked by Kickoff)
+          [Design] (Blocked by Requirements)
+                [Frontend Dev] (Blocked by Design)
+                [Backend Dev] (Blocked by Design)
+                      [Testing] (Blocked by Frontend & Backend)
+                      [Docs] (Blocked by Frontend)
+                            [Deploy] (Blocked by Testing & Docs)
 ```
+
+✓ = Completed task
+Arrows (→) indicate dependency relationships
 
 ## Tips for Testing
 
@@ -185,6 +247,10 @@ Feb  |  Mar  |  Apr
 4. **Test on mobile** to verify responsive design
 5. **Open in multiple browsers** to test real-time sync
 6. **Edit and delete tasks** to verify all CRUD operations
+7. **Create dependency chains** to test the blocked/ready indicators
+8. **Complete prerequisite tasks** to see dependent tasks become ready
+9. **Try circular dependencies** to verify validation works
+10. **Use the Next Up panel** to see intelligent task prioritization
 
 ## Sample Team Structure
 

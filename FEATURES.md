@@ -23,12 +23,15 @@ Complete feature list for the Task Manager application.
 
 ### Create Tasks
 - Title (required)
-- Assignee (optional)
+- User Name (required) - Primary person responsible
+- Assignee (optional) - Secondary person
 - Start date (required)
 - End date (required)
 - Status selection
 - Description field
+- **Dependencies (optional)** - Select tasks that must be completed before this one
 - Automatic timestamps (createdAt, updatedAt)
+- Circular dependency validation
 
 ### Edit Tasks
 - Click-to-edit from list view
@@ -43,10 +46,12 @@ Complete feature list for the Task Manager application.
 - Real-time sync across all users
 
 ### View Tasks
-- Gantt chart visualization
-- Detailed list view
+- Gantt chart visualization with dependency information
+- Detailed list view with dependency chains
 - Toggle between views
 - Real-time updates
+- **"Next Up" Panel** - Shows the earliest ready task that can be started now
+- Visual indicators for blocked/ready tasks
 
 ## 📈 Gantt Chart Features
 
@@ -56,6 +61,8 @@ Complete feature list for the Task Manager application.
 - Task progress indication
 - Drag-and-drop to reschedule
 - Adjustable progress bars
+- **Dependency visualization in popups**
+- **Status badges** (Blocked, Ready) for easy identification
 
 ### View Modes
 - **Day View**: Hourly timeline
@@ -74,7 +81,10 @@ Complete feature list for the Task Manager application.
 
 ### Task Details Popup
 - Click any task to see details
-- Shows title, assignee, status, dates, description
+- Shows title, user, assignee, status, dates, description
+- **Displays dependency relationships** - which tasks this depends on
+- **Shows blocking relationships** - which tasks depend on this one
+- **Visual status badges** - indicates if task is blocked or ready
 - Hover for quick info
 - Non-blocking popup
 
@@ -89,9 +99,12 @@ Complete feature list for the Task Manager application.
 ### Detailed Task Cards
 - All task information visible
 - Status badges with color coding
-- Assignee information
+- User and assignee information
 - Date range display
 - Full description text
+- **Dependency information** - shows dependent tasks
+- **Blocking information** - shows tasks this one blocks
+- **Ready/Blocked badges** - visual indicators for task readiness
 
 ### Task Actions
 - Edit button on each task
@@ -118,6 +131,42 @@ Complete feature list for the Task Manager application.
 - Changes from others appear in real-time
 - No conflict resolution needed (last write wins)
 - Suitable for small to medium teams
+
+## 🎯 Scheduling & Dependencies
+
+### Task Dependencies
+- Define prerequisite tasks that must complete first
+- Multi-select interface for choosing dependencies
+- Circular dependency prevention with validation
+- Visual feedback on dependency status
+- Automatic ready/blocked state calculation
+
+### Next Up Panel
+- **Intelligent task prioritization** - Shows the next task you should work on
+- Considers task dependencies - only shows tasks that are ready to start
+- Filters by start date - only shows tasks that should have started
+- **Smart filtering** - excludes completed and on-hold tasks
+- Can be dismissed if not needed
+- Automatically updates as tasks are completed
+
+### Dependency Visualization
+- **In Gantt Chart Popups**:
+  - Lists all tasks this task depends on
+  - Shows which tasks are blocked by this task
+  - Displays dependency task status
+  - Visual badges for blocked/ready state
+  
+- **In List View**:
+  - Full dependency chains displayed
+  - Blocked tasks clearly marked
+  - Ready tasks highlighted
+  - Easy to understand relationships
+
+### Schedule Impact Awareness
+- When viewing a task, see all tasks that depend on it
+- Understand which tasks will be affected by delays
+- Visual indicators help identify critical path tasks
+- Dependencies shown with current status for impact assessment
 
 ## 🎨 User Interface
 
