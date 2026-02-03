@@ -33,13 +33,15 @@ The panel shows tasks that meet ALL of these criteria:
 Current Date: Feb 10, 2026
 
 Available Tasks:
-- Task A: Start Feb 5, no dependencies → ✓ Shows in Next Up
-- Task B: Start Feb 8, depends on Task A (completed) → ✓ Shows in Next Up
+- Task A: Start Feb 5, no dependencies, not started → ✓ Ready
+- Task B: Start Feb 8, depends on Task A (completed) → ✓ Ready  
 - Task C: Start Feb 12, no dependencies → ✗ Not yet (future start date)
 - Task D: Start Feb 6, depends on Task E (in progress) → ✗ Blocked
 - Task F: Start Feb 1, completed → ✗ Already done
 
-Result: Next Up shows Task A (earliest start date among ready tasks)
+Result: Next Up shows Task A
+Reason: Both Task A and Task B are ready (all dependencies met, start dates passed),
+        but Task A has the earliest start date (Feb 5 vs Feb 8), so it's prioritized.
 ```
 
 ### Using Next Up

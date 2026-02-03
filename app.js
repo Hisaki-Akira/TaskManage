@@ -442,7 +442,7 @@ class TaskManager {
                         const blockList = blockedTasks.map(t => 
                             `<li>${this.escapeHtml(t.title)}</li>`
                         ).join('');
-                        blockedInfo = `<p><strong>ブロックしているタスク:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">${blockList}</ul>`;
+                        blockedInfo = `<p><strong>このタスクに依存しているタスク:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">${blockList}</ul>`;
                     }
                     
                     let statusBadge = '';
@@ -542,7 +542,7 @@ class TaskManager {
                         const blockList = blockedTasks.map(t => 
                             `<li>${this.escapeHtml(t.title)}</li>`
                         ).join('');
-                        blockedInfo = `<p><strong>ブロックしているタスク:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">${blockList}</ul>`;
+                        blockedInfo = `<p><strong>このタスクに依存しているタスク:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">${blockList}</ul>`;
                     }
                     
                     let statusBadge = '';
@@ -686,7 +686,7 @@ class TaskManager {
                 const blockList = blockedTasks.map(t => 
                     `<li class="dependency-item">${this.escapeHtml(t.title)}</li>`
                 ).join('');
-                blockedInfo = `<div class="task-item-detail"><strong>ブロックしているタスク:</strong><ul class="dependency-list">${blockList}</ul></div>`;
+                blockedInfo = `<div class="task-item-detail"><strong>このタスクに依存しているタスク:</strong><ul class="dependency-list">${blockList}</ul></div>`;
             }
             
             return `
@@ -896,7 +896,7 @@ class TaskManager {
                 <div><strong>期間:</strong> ${task.startDate} - ${task.endDate}</div>
                 <div><strong>状態:</strong> ${this.translateStatus(task.status)}</div>
                 ${dependencies.length > 0 ? `<div><strong>依存タスク:</strong> ${dependencies.length}件（すべて完了）</div>` : ''}
-                ${blockedTasks.length > 0 ? `<div><strong>このタスクをブロックしているタスク:</strong> ${blockedTasks.length}件</div>` : ''}
+                ${blockedTasks.length > 0 ? `<div><strong>このタスクに依存しているタスク:</strong> ${blockedTasks.length}件</div>` : ''}
                 ${task.description ? `<div style="margin-top: 10px;"><strong>詳細:</strong> ${this.escapeHtml(task.description)}</div>` : ''}
             </div>
         `;

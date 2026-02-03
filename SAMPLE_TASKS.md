@@ -213,9 +213,9 @@ In this structure:
 
 ### Multiple Prerequisites
 ```
-Task A (Completed) → \
-Task B (Completed) →  → Task D (Not Started, Ready)
-Task C (In Progress) → /
+Task A (Completed) ┐
+Task B (Completed) ├─→ Task D (Not Started, Ready)
+Task C (In Progress) ┘
 ```
 Task D depends on A, B, and C:
 - Currently blocked because C is not yet complete
