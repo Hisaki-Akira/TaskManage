@@ -550,6 +550,8 @@ class TaskManager {
     }
 
     // Translation helper for status display
+    // Note: Status values are stored in English in the database for data compatibility
+    // This function translates them to Japanese for UI display only
     translateStatus(status) {
         const statusTranslations = {
             'Not Started': '未着手',
