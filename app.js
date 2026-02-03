@@ -265,7 +265,7 @@ class TaskManager {
             if (!depTask) continue;
             
             const depDependencies = depTask.dependencies || [];
-            if (this.detectCircularDependency(depId, depDependencies, new Set(visited))) {
+            if (this.detectCircularDependency(depId, depDependencies, visited)) {
                 return true;
             }
         }
@@ -412,9 +412,26 @@ class TaskManager {
         }
 
         // Check for circular dependencies
-        if (taskId && this.detectCircularDependency(taskId, dependencies)) {
-            alert('循環依存が検出されました。依存関係を確認してください。');
-            return;
+        // For existing tasks, check if adding these dependencies creates a cycle
+        // For new tasks, check if the dependencies themselves form a cycle
+        if (taskId) {
+            if (this.detectCircularDependency(taskId, dependencies)) {
+                alert('循環依存が検出されました。依存関係を確認してください。');
+                return;
+            }
+        } else {
+            // For new tasks, check if any dependency would create a cycle back to this task
+            // by checking if any dependency depends on any other dependency
+            for (const depId of dependencies) {
+                const otherDeps = dependencies.filter(d => d !== depId);
+                if (otherDeps.some(otherId => {
+                    const depTask = this.getTaskById(otherId);
+                    return depTask && (depTask.dependencies || []).includes(depId);
+                })) {
+                    alert('循環依存が検出されました。選択した依存タスク間に既に依存関係があります。');
+                    return;
+                }
+            }
         }
 
         // Validate that start date is after all dependency end dates
