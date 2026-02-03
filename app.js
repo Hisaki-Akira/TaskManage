@@ -9,6 +9,7 @@ class TaskManager {
         this.editingTaskId = null;
         this.unsubscribeSnapshot = null;
         this.UNASSIGNED_USER = '未割り当て';
+        this.nextUpDismissed = false;
         
         this.init();
     }
@@ -150,6 +151,7 @@ class TaskManager {
 
     openTaskModal() {
         this.resetForm();
+        this.populateDependencyOptions();
         document.getElementById('task-modal').classList.remove('hidden');
         document.getElementById('modal-title').textContent = '新しいタスクを作成';
         document.getElementById('submit-btn').textContent = 'タスクを作成';
@@ -204,6 +206,7 @@ class TaskManager {
                 if (this.currentView === 'list') {
                     this.renderTaskList();
                 }
+                this.updateNextUpPanel();
                 this.showLoading(false);
             }, error => {
                 console.error('Error loading tasks:', error);
@@ -223,6 +226,10 @@ class TaskManager {
         const endDate = document.getElementById('task-end-date').value;
         const status = document.getElementById('task-status').value;
         const description = document.getElementById('task-description').value.trim();
+        
+        // Get selected dependencies
+        const dependencySelect = document.getElementById('task-dependencies');
+        const dependencies = Array.from(dependencySelect.selectedOptions).map(opt => opt.value);
 
         if (!title || !userName || !startDate || !endDate) {
             alert('必須項目をすべて入力してください');
@@ -232,6 +239,18 @@ class TaskManager {
         // Validate dates
         if (new Date(endDate) < new Date(startDate)) {
             alert('終了日は開始日より前にできません');
+            return;
+        }
+        
+        // Check for circular dependencies
+        if (taskId && dependencies.includes(taskId)) {
+            alert('タスクは自分自身に依存できません');
+            return;
+        }
+        
+        // Check for circular dependency chains
+        if (taskId && this.hasCircularDependency(taskId, dependencies)) {
+            alert('循環依存が検出されました。依存関係を見直してください。');
             return;
         }
 
@@ -245,6 +264,7 @@ class TaskManager {
             endDate,
             status,
             description: description || '',
+            dependencies: dependencies || [],
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -281,6 +301,15 @@ class TaskManager {
         document.getElementById('task-end-date').value = task.endDate;
         document.getElementById('task-status').value = task.status;
         document.getElementById('task-description').value = task.description || '';
+        
+        // Populate and select dependencies
+        this.populateDependencyOptions(taskId);
+        const dependencySelect = document.getElementById('task-dependencies');
+        if (task.dependencies && task.dependencies.length > 0) {
+            Array.from(dependencySelect.options).forEach(option => {
+                option.selected = task.dependencies.includes(option.value);
+            });
+        }
         
         document.getElementById('modal-title').textContent = 'タスクを編集';
         document.getElementById('submit-btn').textContent = 'タスクを更新';
@@ -395,13 +424,43 @@ class TaskManager {
                 date_format: 'YYYY-MM-DD',
                 custom_popup_html: (task) => {
                     const taskData = this.tasks.find(t => t.id === task.id);
+                    const dependencies = this.getTaskDependencies(task.id);
+                    const blockedTasks = this.getBlockingTasks(task.id);
+                    const isReady = this.isTaskReady(taskData);
+                    const isBlocked = this.isTaskBlocked(taskData);
+                    
+                    let dependencyInfo = '';
+                    if (dependencies.length > 0) {
+                        const depList = dependencies.map(dep => 
+                            `<li>${this.escapeHtml(dep.title)} (${this.translateStatus(dep.status)})</li>`
+                        ).join('');
+                        dependencyInfo = `<p><strong>依存タスク:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">${depList}</ul>`;
+                    }
+                    
+                    let blockedInfo = '';
+                    if (blockedTasks.length > 0) {
+                        const blockList = blockedTasks.map(t => 
+                            `<li>${this.escapeHtml(t.title)}</li>`
+                        ).join('');
+                        blockedInfo = `<p><strong>このタスクに依存しているタスク:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">${blockList}</ul>`;
+                    }
+                    
+                    let statusBadge = '';
+                    if (isBlocked) {
+                        statusBadge = '<span style="background: rgba(244, 67, 54, 0.2); color: #d32f2f; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">ブロック中</span>';
+                    } else if (isReady && taskData.status !== 'Completed') {
+                        statusBadge = '<span style="background: rgba(76, 175, 80, 0.2); color: #388e3c; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">準備完了</span>';
+                    }
+                    
                     return `
                         <div class="gantt-popup">
-                            <h3>${task.name}</h3>
+                            <h3>${task.name} ${statusBadge}</h3>
                             ${taskData.userName ? `<p><strong>ユーザー:</strong> ${taskData.userName}</p>` : ''}
                             ${taskData.assignee ? `<p><strong>担当者:</strong> ${taskData.assignee}</p>` : ''}
                             <p><strong>状態:</strong> ${this.translateStatus(taskData.status)}</p>
                             <p><strong>期間:</strong> ${task.start} - ${task.end}</p>
+                            ${dependencyInfo}
+                            ${blockedInfo}
                             ${taskData.description ? `<p><strong>説明:</strong> ${taskData.description}</p>` : ''}
                         </div>
                     `;
@@ -465,13 +524,43 @@ class TaskManager {
                 date_format: 'YYYY-MM-DD',
                 custom_popup_html: (task) => {
                     const taskData = this.tasks.find(t => t.id === task.id);
+                    const dependencies = this.getTaskDependencies(task.id);
+                    const blockedTasks = this.getBlockingTasks(task.id);
+                    const isReady = this.isTaskReady(taskData);
+                    const isBlocked = this.isTaskBlocked(taskData);
+                    
+                    let dependencyInfo = '';
+                    if (dependencies.length > 0) {
+                        const depList = dependencies.map(dep => 
+                            `<li>${this.escapeHtml(dep.title)} (${this.translateStatus(dep.status)})</li>`
+                        ).join('');
+                        dependencyInfo = `<p><strong>依存タスク:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">${depList}</ul>`;
+                    }
+                    
+                    let blockedInfo = '';
+                    if (blockedTasks.length > 0) {
+                        const blockList = blockedTasks.map(t => 
+                            `<li>${this.escapeHtml(t.title)}</li>`
+                        ).join('');
+                        blockedInfo = `<p><strong>このタスクに依存しているタスク:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">${blockList}</ul>`;
+                    }
+                    
+                    let statusBadge = '';
+                    if (isBlocked) {
+                        statusBadge = '<span style="background: rgba(244, 67, 54, 0.2); color: #d32f2f; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">ブロック中</span>';
+                    } else if (isReady && taskData.status !== 'Completed') {
+                        statusBadge = '<span style="background: rgba(76, 175, 80, 0.2); color: #388e3c; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">準備完了</span>';
+                    }
+                    
                     return `
                         <div class="gantt-popup">
-                            <h3>${task.name}</h3>
+                            <h3>${task.name} ${statusBadge}</h3>
                             ${taskData.userName ? `<p><strong>ユーザー:</strong> ${taskData.userName}</p>` : ''}
                             ${taskData.assignee ? `<p><strong>担当者:</strong> ${taskData.assignee}</p>` : ''}
                             <p><strong>状態:</strong> ${this.translateStatus(taskData.status)}</p>
                             <p><strong>期間:</strong> ${task.start} - ${task.end}</p>
+                            ${dependencyInfo}
+                            ${blockedInfo}
                             ${taskData.description ? `<p><strong>説明:</strong> ${taskData.description}</p>` : ''}
                         </div>
                     `;
@@ -571,29 +660,62 @@ class TaskManager {
             return;
         }
 
-        container.innerHTML = this.tasks.map(task => `
-            <div class="task-item">
-                <div class="task-item-header">
-                    <div>
-                        <div class="task-item-title">${this.escapeHtml(task.title)}</div>
-                        <span class="task-item-status status-${this.getStatusSlug(task.status)}">
-                            ${this.translateStatus(task.status)}
-                        </span>
+        container.innerHTML = this.tasks.map(task => {
+            const isReady = this.isTaskReady(task);
+            const isBlocked = this.isTaskBlocked(task);
+            const dependencies = this.getTaskDependencies(task.id);
+            const blockedTasks = this.getBlockingTasks(task.id);
+            
+            let statusBadge = '';
+            if (isBlocked) {
+                statusBadge = '<span class="task-blocked-badge">ブロック中</span>';
+            } else if (isReady && task.status !== 'Completed') {
+                statusBadge = '<span class="task-ready-badge">準備完了</span>';
+            }
+            
+            let dependencyInfo = '';
+            if (dependencies.length > 0) {
+                const depList = dependencies.map(dep => 
+                    `<li class="dependency-item">${this.escapeHtml(dep.title)} (${this.translateStatus(dep.status)})</li>`
+                ).join('');
+                dependencyInfo = `<div class="task-item-detail"><strong>依存タスク:</strong><ul class="dependency-list">${depList}</ul></div>`;
+            }
+            
+            let blockedInfo = '';
+            if (blockedTasks.length > 0) {
+                const blockList = blockedTasks.map(t => 
+                    `<li class="dependency-item">${this.escapeHtml(t.title)}</li>`
+                ).join('');
+                blockedInfo = `<div class="task-item-detail"><strong>このタスクに依存しているタスク:</strong><ul class="dependency-list">${blockList}</ul></div>`;
+            }
+            
+            return `
+                <div class="task-item">
+                    <div class="task-item-header">
+                        <div>
+                            <div class="task-item-title">${this.escapeHtml(task.title)}</div>
+                            <span class="task-item-status status-${this.getStatusSlug(task.status)}">
+                                ${this.translateStatus(task.status)}
+                            </span>
+                            ${statusBadge}
+                        </div>
+                    </div>
+                    <div class="task-item-details">
+                        ${task.userName ? `<div class="task-item-detail"><strong>ユーザー:</strong> ${this.escapeHtml(task.userName)}</div>` : ''}
+                        ${task.assignee ? `<div class="task-item-detail"><strong>担当者:</strong> ${this.escapeHtml(task.assignee)}</div>` : ''}
+                        <div class="task-item-detail"><strong>開始日:</strong> ${task.startDate}</div>
+                        <div class="task-item-detail"><strong>終了日:</strong> ${task.endDate}</div>
+                        ${dependencyInfo}
+                        ${blockedInfo}
+                        ${task.description ? `<div class="task-item-detail"><strong>説明:</strong> ${this.escapeHtml(task.description)}</div>` : ''}
+                    </div>
+                    <div class="task-item-actions">
+                        <button class="btn-edit" onclick="app.editTask('${task.id}')">編集</button>
+                        <button class="btn-danger" onclick="app.deleteTask('${task.id}')">削除</button>
                     </div>
                 </div>
-                <div class="task-item-details">
-                    ${task.userName ? `<div class="task-item-detail"><strong>ユーザー:</strong> ${this.escapeHtml(task.userName)}</div>` : ''}
-                    ${task.assignee ? `<div class="task-item-detail"><strong>担当者:</strong> ${this.escapeHtml(task.assignee)}</div>` : ''}
-                    <div class="task-item-detail"><strong>開始日:</strong> ${task.startDate}</div>
-                    <div class="task-item-detail"><strong>終了日:</strong> ${task.endDate}</div>
-                    ${task.description ? `<div class="task-item-detail"><strong>説明:</strong> ${this.escapeHtml(task.description)}</div>` : ''}
-                </div>
-                <div class="task-item-actions">
-                    <button class="btn-edit" onclick="app.editTask('${task.id}')">編集</button>
-                    <button class="btn-danger" onclick="app.deleteTask('${task.id}')">削除</button>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     getStatusSlug(status) {
@@ -604,6 +726,185 @@ class TaskManager {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+    
+    // Dependency Management Methods
+    populateDependencyOptions(excludeTaskId = null) {
+        const select = document.getElementById('task-dependencies');
+        select.innerHTML = '<option value="">依存なし</option>';
+        
+        // Filter out the current task being edited
+        const availableTasks = this.tasks.filter(t => t.id !== excludeTaskId);
+        
+        availableTasks.forEach(task => {
+            const option = document.createElement('option');
+            option.value = task.id;
+            option.textContent = `${task.title} (${task.startDate} - ${task.endDate})`;
+            select.appendChild(option);
+        });
+    }
+    
+    hasCircularDependency(taskId, newDependencies) {
+        // Check if adding these dependencies would create a circular dependency
+        const visited = new Set();
+        const recursionStack = new Set();
+        
+        const hasCycle = (currentId) => {
+            if (recursionStack.has(currentId)) {
+                return true; // Found a cycle
+            }
+            if (visited.has(currentId)) {
+                return false; // Already checked this path
+            }
+            
+            visited.add(currentId);
+            recursionStack.add(currentId);
+            
+            // Get dependencies for current task
+            const task = this.tasks.find(t => t.id === currentId);
+            const deps = task ? (task.dependencies || []) : [];
+            
+            // If this is the task being edited, use the new dependencies
+            const depsToCheck = (currentId === taskId) ? newDependencies : deps;
+            
+            for (const depId of depsToCheck) {
+                if (hasCycle(depId)) {
+                    return true;
+                }
+            }
+            
+            recursionStack.delete(currentId);
+            return false;
+        };
+        
+        return hasCycle(taskId);
+    }
+    
+    getTaskDependencies(taskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !task.dependencies) return [];
+        
+        return task.dependencies
+            .map(depId => this.tasks.find(t => t.id === depId))
+            .filter(t => t !== undefined);
+    }
+    
+    getBlockingTasks(taskId) {
+        // Get all tasks that this task blocks (tasks that depend on this one)
+        return this.tasks.filter(t => 
+            t.dependencies && t.dependencies.includes(taskId)
+        );
+    }
+    
+    isTaskReady(task) {
+        // A task is ready if all its dependencies are completed
+        if (!task.dependencies || task.dependencies.length === 0) {
+            return true;
+        }
+        
+        return task.dependencies.every(depId => {
+            const depTask = this.tasks.find(t => t.id === depId);
+            return depTask && depTask.status === 'Completed';
+        });
+    }
+    
+    isTaskBlocked(task) {
+        // A task is blocked if it has incomplete dependencies
+        if (!task.dependencies || task.dependencies.length === 0) {
+            return false;
+        }
+        
+        return task.dependencies.some(depId => {
+            const depTask = this.tasks.find(t => t.id === depId);
+            return depTask && depTask.status !== 'Completed';
+        });
+    }
+    
+    // Next Up Panel Methods
+    updateNextUpPanel() {
+        if (this.nextUpDismissed) {
+            return;
+        }
+        
+        const panel = document.getElementById('next-up-panel');
+        const content = document.getElementById('next-up-content');
+        
+        // Find the next ready task
+        const nextTask = this.findNextTask();
+        
+        if (nextTask) {
+            panel.classList.remove('hidden');
+            content.innerHTML = this.renderNextUpTask(nextTask);
+        } else {
+            // Check if there are any incomplete tasks
+            const incompleteTasks = this.tasks.filter(t => 
+                t.status !== 'Completed'
+            );
+            
+            if (incompleteTasks.length > 0) {
+                panel.classList.remove('hidden');
+                content.innerHTML = '<div class="next-up-empty">すべてのタスクがブロックされています。依存関係を確認してください。</div>';
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+    }
+    
+    findNextTask() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Filter tasks that are:
+        // 1. Not completed
+        // 2. Not on hold
+        // 3. Ready (all dependencies completed)
+        // 4. Started or should have started
+        const candidateTasks = this.tasks.filter(task => {
+            if (task.status === 'Completed' || task.status === 'On Hold') {
+                return false;
+            }
+            
+            if (!this.isTaskReady(task)) {
+                return false;
+            }
+            
+            const startDate = new Date(task.startDate);
+            startDate.setHours(0, 0, 0, 0);
+            
+            return startDate <= today;
+        });
+        
+        // Sort by start date (earliest first)
+        candidateTasks.sort((a, b) => {
+            const dateA = new Date(a.startDate);
+            const dateB = new Date(b.startDate);
+            return dateA - dateB;
+        });
+        
+        return candidateTasks[0] || null;
+    }
+    
+    renderNextUpTask(task) {
+        const dependencies = this.getTaskDependencies(task.id);
+        const blockedTasks = this.getBlockingTasks(task.id);
+        
+        return `
+            <div class="next-up-task-title">${this.escapeHtml(task.title)}</div>
+            <div class="next-up-task-details">
+                ${task.userName ? `<div><strong>担当:</strong> ${this.escapeHtml(task.userName)}</div>` : ''}
+                ${task.assignee ? `<div><strong>アサイン先:</strong> ${this.escapeHtml(task.assignee)}</div>` : ''}
+                <div><strong>期間:</strong> ${task.startDate} - ${task.endDate}</div>
+                <div><strong>状態:</strong> ${this.translateStatus(task.status)}</div>
+                ${dependencies.length > 0 ? `<div><strong>依存タスク:</strong> ${dependencies.length}件（すべて完了）</div>` : ''}
+                ${blockedTasks.length > 0 ? `<div><strong>このタスクに依存しているタスク:</strong> ${blockedTasks.length}件</div>` : ''}
+                ${task.description ? `<div style="margin-top: 10px;"><strong>詳細:</strong> ${this.escapeHtml(task.description)}</div>` : ''}
+            </div>
+        `;
+    }
+    
+    dismissNextUp() {
+        this.nextUpDismissed = true;
+        document.getElementById('next-up-panel').classList.add('hidden');
     }
 }
 
