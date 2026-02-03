@@ -1,0 +1,9 @@
+# Firestore indexes (if needed in the future)
+indexes:
+  - collectionGroup: tasks
+    queryScope: COLLECTION
+    fields:
+      - fieldPath: startDate
+        order: ASCENDING
+      - fieldPath: endDate
+        order: ASCENDING

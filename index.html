@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - FTC SIT-Kashiwa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.css">
+</head>
+<body>
+    <!-- Auth Container -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-box">
+            <h1>Task Manager</h1>
+            <p class="subtitle">FTC Member - SIT-Kashiwa</p>
+            
+            <div id="login-form" class="auth-form">
+                <h2>Sign In</h2>
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button onclick="app.signIn()">Sign In</button>
+                <p class="toggle-auth">Don't have an account? <a href="#" onclick="app.toggleAuthForm(); return false;">Sign Up</a></p>
+            </div>
+            
+            <div id="signup-form" class="auth-form hidden">
+                <h2>Sign Up</h2>
+                <input type="email" id="signup-email" placeholder="Email" required>
+                <input type="password" id="signup-password" placeholder="Password (min 6 characters)" required>
+                <button onclick="app.signUp()">Sign Up</button>
+                <p class="toggle-auth">Already have an account? <a href="#" onclick="app.toggleAuthForm(); return false;">Sign In</a></p>
+            </div>
+            
+            <div id="auth-error" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app-container" class="app-container hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1>Task Manager</h1>
+                <span class="user-email" id="user-email"></span>
+            </div>
+            <div class="header-right">
+                <button onclick="app.toggleView()" id="view-toggle-btn" class="btn-secondary">Switch to List View</button>
+                <button onclick="app.signOut()" class="btn-secondary">Sign Out</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Task Form -->
+            <div class="task-form-container">
+                <h2 id="form-title">Create New Task</h2>
+                <form id="task-form" onsubmit="app.handleTaskSubmit(event)">
+                    <input type="hidden" id="task-id">
+                    
+                    <div class="form-group">
+                        <label for="task-title">Title *</label>
+                        <input type="text" id="task-title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-assignee">Assignee</label>
+                        <input type="text" id="task-assignee" placeholder="e.g., John Doe">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-start-date">Start Date *</label>
+                            <input type="date" id="task-start-date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="task-end-date">End Date *</label>
+                            <input type="date" id="task-end-date" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-status">Status</label>
+                        <select id="task-status">
+                            <option value="Not Started">Not Started</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="On Hold">On Hold</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-description">Description</label>
+                        <textarea id="task-description" rows="3" placeholder="Task details..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="submit-btn">Create Task</button>
+                        <button type="button" class="btn-secondary" onclick="app.cancelEdit()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Gantt Chart View -->
+            <div id="gantt-view" class="gantt-view">
+                <div class="view-header">
+                    <h2>Gantt Chart</h2>
+                    <div class="gantt-controls">
+                        <button onclick="app.changeGanttView('Day')" class="btn-view">Day</button>
+                        <button onclick="app.changeGanttView('Week')" class="btn-view active">Week</button>
+                        <button onclick="app.changeGanttView('Month')" class="btn-view">Month</button>
+                    </div>
+                </div>
+                <div id="gantt-container"></div>
+            </div>
+
+            <!-- Task List View -->
+            <div id="list-view" class="list-view hidden">
+                <h2>Task List</h2>
+                <div class="task-list" id="task-list">
+                    <!-- Tasks will be rendered here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Frappe Gantt -->
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
