@@ -8,6 +8,7 @@ class TaskManager {
         this.ganttViewMode = 'Week';
         this.editingTaskId = null;
         this.unsubscribeSnapshot = null;
+        this.UNASSIGNED_USER = 'Unassigned';
         
         this.init();
     }
@@ -238,7 +239,7 @@ class TaskManager {
 
         const taskData = {
             title,
-            userName: userName || '',
+            userName,
             assignee: assignee || '',
             startDate,
             endDate,
@@ -336,7 +337,7 @@ class TaskManager {
     groupTasksByUser() {
         const tasksByUser = {};
         this.tasks.forEach(task => {
-            const userName = task.userName || 'Unassigned';
+            const userName = task.userName || this.UNASSIGNED_USER;
             if (!tasksByUser[userName]) {
                 tasksByUser[userName] = [];
             }
@@ -361,7 +362,7 @@ class TaskManager {
             
             const userGanttContainer = document.createElement('div');
             userGanttContainer.className = 'gantt-user-container';
-            userGanttContainer.id = `gantt-user-${userName.replace(/\s+/g, '-')}`;
+            userGanttContainer.id = `gantt-user-${this.sanitizeId(userName)}`;
             userSection.appendChild(userGanttContainer);
             
             container.appendChild(userSection);
@@ -369,6 +370,11 @@ class TaskManager {
             // Render Gantt chart for this user's tasks
             this.renderGanttForUser(userGanttContainer, tasksByUser[userName]);
         });
+    }
+
+    sanitizeId(str) {
+        // Replace any character that's not alphanumeric, hyphen, or underscore with hyphen
+        return str.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/--+/g, '-');
     }
 
     renderGanttForUser(container, tasks) {
