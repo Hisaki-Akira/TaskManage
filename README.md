@@ -5,8 +5,9 @@ A web-based task management tool with Gantt chart visualization, built for FTC m
 ## Features
 
 - 🔐 **Authentication**: Email/Password authentication via Firebase
-- 📊 **Gantt Chart**: Interactive Gantt chart with drag-and-drop support
-- 📝 **Task Management**: Create, edit, and delete tasks with full CRUD operations
+- 📊 **Gantt Chart**: Interactive Gantt chart with drag-and-drop support and user-based vertical grouping
+- 📝 **Task Management**: Create, edit, and delete tasks with full CRUD operations via popup modal dialog
+- 👤 **Username Assignment**: Tasks include username field for better user identification and grouping
 - 👥 **Multi-user Access**: All authenticated users can read and write tasks
 - 🔄 **Real-time Updates**: Automatic synchronization across all users
 - 📱 **Responsive Design**: Works on desktop, tablet, and mobile devices
@@ -147,19 +148,23 @@ https://hisaki-akira.github.io/TaskManage/
 
 ### Creating a Task
 
-1. Fill in the task form at the top of the page:
+1. Click the **"+ Add Task"** button at the top of the page to open the task creation modal
+2. Fill in the task form in the popup dialog:
    - **Title**: Task name (required)
-   - **Assignee**: Person responsible for the task
+   - **Username**: Username associated with the task (required) - used for grouping in Gantt chart
+   - **Assignee**: Person responsible for the task (optional)
    - **Start Date**: When the task begins (required)
    - **End Date**: When the task should be completed (required)
    - **Status**: Current task status
    - **Description**: Additional details about the task
 
-2. Click "Create Task" to add the task
+3. Click "Create Task" to add the task, or "Cancel" to close the modal without saving
 
 ### Viewing Tasks
 
-- **Gantt Chart View**: See tasks on a visual timeline
+- **Gantt Chart View**: See tasks on a visual timeline grouped by username
+  - Tasks are grouped vertically by username on the Y-axis (with dates on the X-axis)
+  - Task names are displayed as `[username] Task Title` for easy identification
   - Switch between Day, Week, and Month views
   - Drag tasks to change dates
   - Adjust progress by dragging task bars
@@ -167,13 +172,13 @@ https://hisaki-akira.github.io/TaskManage/
 
 - **List View**: See tasks in a detailed list format
   - Toggle between views using the "Switch to List View" button
-  - See all task details at a glance
+  - See all task details including username and assignee at a glance
 
 ### Editing Tasks
 
 - **From List View**: Click the "Edit" button on any task
-- **From Form**: The task details will populate the form
-- Make your changes and click "Update Task"
+- **From Modal Dialog**: The task details will populate the form in the modal dialog
+- Make your changes and click "Update Task", or "Cancel" to discard changes
 
 ### Deleting Tasks
 

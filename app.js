@@ -8,6 +8,7 @@ class TaskManager {
         this.ganttViewMode = 'Week';
         this.editingTaskId = null;
         this.unsubscribeSnapshot = null;
+        this.modalOpen = false;
         
         this.init();
     }
@@ -22,6 +23,14 @@ class TaskManager {
             } else {
                 this.currentUser = null;
                 this.showAuth();
+            }
+        });
+        
+        // Close modal on outside click
+        const modal = document.getElementById('task-modal');
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeTaskModal();
             }
         });
     }
@@ -167,6 +176,21 @@ class TaskManager {
         }
     }
 
+    // Modal Methods
+    openTaskModal() {
+        this.resetForm();
+        document.getElementById('modal-title').textContent = 'Create New Task';
+        document.getElementById('submit-btn').textContent = 'Create Task';
+        document.getElementById('task-modal').classList.remove('hidden');
+        this.modalOpen = true;
+    }
+
+    closeTaskModal() {
+        document.getElementById('task-modal').classList.add('hidden');
+        this.resetForm();
+        this.modalOpen = false;
+    }
+
     // Task Management Methods
     loadTasks() {
         this.showLoading(true);
@@ -200,13 +224,14 @@ class TaskManager {
         
         const taskId = document.getElementById('task-id').value;
         const title = document.getElementById('task-title').value.trim();
+        const username = document.getElementById('task-username').value.trim();
         const assignee = document.getElementById('task-assignee').value.trim();
         const startDate = document.getElementById('task-start-date').value;
         const endDate = document.getElementById('task-end-date').value;
         const status = document.getElementById('task-status').value;
         const description = document.getElementById('task-description').value.trim();
 
-        if (!title || !startDate || !endDate) {
+        if (!title || !username || !startDate || !endDate) {
             alert('Please fill in all required fields');
             return;
         }
@@ -221,6 +246,7 @@ class TaskManager {
 
         const taskData = {
             title,
+            username,
             assignee: assignee || '',
             startDate,
             endDate,
@@ -239,7 +265,7 @@ class TaskManager {
                 await db.collection('tasks').add(taskData);
             }
             
-            this.resetForm();
+            this.closeTaskModal();
             this.showLoading(false);
         } catch (error) {
             console.error('Error saving task:', error);
@@ -256,17 +282,19 @@ class TaskManager {
         
         document.getElementById('task-id').value = taskId;
         document.getElementById('task-title').value = task.title;
+        document.getElementById('task-username').value = task.username || 'Unknown User';
         document.getElementById('task-assignee').value = task.assignee || '';
         document.getElementById('task-start-date').value = task.startDate;
         document.getElementById('task-end-date').value = task.endDate;
         document.getElementById('task-status').value = task.status;
         document.getElementById('task-description').value = task.description || '';
         
-        document.getElementById('form-title').textContent = 'Edit Task';
+        document.getElementById('modal-title').textContent = 'Edit Task';
         document.getElementById('submit-btn').textContent = 'Update Task';
         
-        // Scroll to form
-        document.querySelector('.task-form-container').scrollIntoView({ behavior: 'smooth' });
+        // Open modal
+        document.getElementById('task-modal').classList.remove('hidden');
+        this.modalOpen = true;
     }
 
     async deleteTask(taskId) {
@@ -286,14 +314,14 @@ class TaskManager {
     }
 
     cancelEdit() {
-        this.resetForm();
+        this.closeTaskModal();
     }
 
     resetForm() {
         this.editingTaskId = null;
         document.getElementById('task-form').reset();
         document.getElementById('task-id').value = '';
-        document.getElementById('form-title').textContent = 'Create New Task';
+        document.getElementById('modal-title').textContent = 'Create New Task';
         document.getElementById('submit-btn').textContent = 'Create Task';
     }
 
@@ -306,15 +334,33 @@ class TaskManager {
             return;
         }
 
-        // Convert tasks to Gantt format
-        const ganttTasks = this.tasks.map(task => ({
-            id: task.id,
-            name: task.title,
-            start: task.startDate,
-            end: task.endDate,
-            progress: this.getProgressFromStatus(task.status),
-            custom_class: this.getStatusClass(task.status)
-        }));
+        // Group tasks by username
+        const userGroups = {};
+        this.tasks.forEach(task => {
+            const username = task.username || 'Unknown User';
+            if (!userGroups[username]) {
+                userGroups[username] = [];
+            }
+            userGroups[username].push(task);
+        });
+
+        // Sort usernames alphabetically
+        const sortedUsernames = Object.keys(userGroups).sort();
+
+        // Create Gantt tasks with username prefix for vertical grouping
+        const ganttTasks = [];
+        sortedUsernames.forEach(username => {
+            userGroups[username].forEach(task => {
+                ganttTasks.push({
+                    id: task.id,
+                    name: `[${username}] ${task.title}`,
+                    start: task.startDate,
+                    end: task.endDate,
+                    progress: this.getProgressFromStatus(task.status),
+                    custom_class: this.getStatusClass(task.status)
+                });
+            });
+        });
 
         // Clear container
         container.innerHTML = '';
@@ -328,7 +374,8 @@ class TaskManager {
                     const taskData = this.tasks.find(t => t.id === task.id);
                     return `
                         <div class="gantt-popup">
-                            <h3>${task.name}</h3>
+                            <h3>${taskData.title}</h3>
+                            ${taskData.username ? `<p><strong>Username:</strong> ${taskData.username}</p>` : ''}
                             ${taskData.assignee ? `<p><strong>Assignee:</strong> ${taskData.assignee}</p>` : ''}
                             <p><strong>Status:</strong> ${taskData.status}</p>
                             <p><strong>Duration:</strong> ${task.start} - ${task.end}</p>
@@ -429,6 +476,7 @@ class TaskManager {
                     </div>
                 </div>
                 <div class="task-item-details">
+                    ${task.username ? `<div class="task-item-detail"><strong>Username:</strong> ${this.escapeHtml(task.username)}</div>` : ''}
                     ${task.assignee ? `<div class="task-item-detail"><strong>Assignee:</strong> ${this.escapeHtml(task.assignee)}</div>` : ''}
                     <div class="task-item-detail"><strong>Start Date:</strong> ${task.startDate}</div>
                     <div class="task-item-detail"><strong>End Date:</strong> ${task.endDate}</div>
