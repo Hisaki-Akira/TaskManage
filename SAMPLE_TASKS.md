@@ -21,6 +21,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **End Date**: 2026-02-10
 - **Status**: In Progress
 - **Description**: Meet with stakeholders to collect and document all project requirements.
+- **Dependencies**: Task 1 (Project Kickoff)
 
 ### Task 3: Design Phase
 - **Title**: Create System Design
@@ -30,6 +31,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **End Date**: 2026-02-17
 - **Status**: Not Started
 - **Description**: Design the system architecture, database schema, and API endpoints.
+- **Dependencies**: Task 2 (Requirements Gathering)
 
 ### Task 4: Frontend Development
 - **Title**: Develop User Interface
@@ -39,6 +41,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **End Date**: 2026-02-28
 - **Status**: Not Started
 - **Description**: Build responsive UI components and integrate with backend APIs.
+- **Dependencies**: Task 3 (System Design)
 
 ### Task 5: Backend Development
 - **Title**: Build Backend APIs
@@ -48,6 +51,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **End Date**: 2026-02-28
 - **Status**: Not Started
 - **Description**: Develop RESTful APIs, database integration, and business logic.
+- **Dependencies**: Task 3 (System Design)
 
 ### Task 6: Testing
 - **Title**: Quality Assurance Testing
@@ -57,6 +61,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **End Date**: 2026-03-07
 - **Status**: Not Started
 - **Description**: Perform unit testing, integration testing, and user acceptance testing.
+- **Dependencies**: Task 4 (Frontend Development), Task 5 (Backend Development)
 
 ### Task 7: Documentation
 - **Title**: Write User Documentation
@@ -66,6 +71,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **End Date**: 2026-03-05
 - **Status**: Not Started
 - **Description**: Create user guides, API documentation, and deployment instructions.
+- **Dependencies**: Task 4 (Frontend Development), Task 5 (Backend Development)
 
 ### Task 8: Deployment
 - **Title**: Deploy to Production
@@ -75,6 +81,7 @@ This document shows example tasks you can create to test the Task Manager applic
 - **End Date**: 2026-03-08
 - **Status**: Not Started
 - **Description**: Deploy application to production environment and configure monitoring.
+- **Dependencies**: Task 6 (Testing), Task 7 (Documentation)
 
 ## Task Data Structure
 
@@ -89,6 +96,7 @@ Each task in Firestore has the following structure:
   endDate: "2026-02-10",           // String (YYYY-MM-DD), required
   status: "In Progress",            // String, one of: "Not Started", "In Progress", "Completed", "On Hold"
   description: "Task details...",   // String, optional
+  dependencies: ["taskId1", "taskId2"], // Array of task IDs, optional - Tasks that must be completed first
   createdAt: Timestamp,             // Firebase Timestamp, auto-generated
   updatedAt: Timestamp              // Firebase Timestamp, auto-updated
 }
@@ -98,6 +106,13 @@ Each task in Firestore has the following structure:
 
 - **User Name** (required): The primary person responsible for this task. Tasks are grouped by user name in the Gantt chart view.
 - **Assignee** (optional): A secondary person who may be helping or reviewing the task. This is useful for collaborative work.
+
+### Dependencies
+
+- **Dependencies** (optional): An array of task IDs that must be completed before this task can start.
+- Tasks with uncompleted dependencies are marked as "ブロック中" (Blocked) in the UI.
+- Tasks with all dependencies completed are marked as "準備完了" (Ready) if not yet started.
+- The system detects circular dependencies and prevents their creation.
 
 ## Status Options
 

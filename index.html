@@ -59,6 +59,14 @@
 
             <!-- Gantt Chart View -->
             <div id="gantt-view" class="gantt-view">
+                <!-- Next Tasks Panel -->
+                <div id="next-tasks-panel" class="next-tasks-panel">
+                    <h3>📌 次のタスク</h3>
+                    <div id="next-tasks-list" class="next-tasks-list">
+                        <!-- Next tasks will be rendered here -->
+                    </div>
+                </div>
+                
                 <div class="view-header">
                     <h2>ガントチャート</h2>
                     <div class="gantt-controls">
@@ -138,6 +146,15 @@
                     <div class="form-group">
                         <label for="task-description">説明</label>
                         <textarea id="task-description" rows="3" placeholder="タスクの詳細..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>依存タスク</label>
+                        <div class="dependencies-help">このタスクを開始する前に完了する必要があるタスクを選択してください</div>
+                        <div id="dependency-warning" class="dependency-warning" style="display: none;"></div>
+                        <div id="task-dependencies-list" class="dependencies-list">
+                            <!-- Dependencies will be rendered here -->
+                        </div>
                     </div>
                     
                     <div class="form-actions">
