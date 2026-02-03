@@ -6,6 +6,10 @@ A web-based task management tool with Gantt chart visualization, built for FTC m
 
 - 🔐 **Authentication**: Email/Password authentication via Firebase
 - 📊 **User-Grouped Gantt Chart**: Interactive Gantt chart with tasks grouped by user vertically
+- 🔗 **Task Dependencies**: Define and visualize task relationships with dependency arrows
+- 🎯 **Next Tasks Panel**: Clear view of tasks ready to work on (no incomplete dependencies)
+- ⚠️ **Bottleneck Detection**: Visual indicators for blocked tasks and critical path tasks
+- 📅 **Smart Scheduling**: Auto-update dependent tasks when dates change
 - 🎯 **Modal Task Creation**: Quick and easy task creation via modal dialog
 - 📝 **Task Management**: Create, edit, and delete tasks with full CRUD operations
 - 👥 **Multi-user Access**: All authenticated users can read and write tasks
@@ -158,9 +162,27 @@ https://hisaki-akira.github.io/TaskManage/
    - **End Date**: When the task should be completed (required)
    - **Status**: Current task status
    - **Description**: Additional details about the task
+   - **Dependencies**: Select prerequisite tasks (use Ctrl/Cmd + Click for multiple)
 
 3. Click "Create Task" to add the task
 4. The modal will close automatically upon successful creation
+
+### Task Dependencies
+
+- **Setting Dependencies**: When creating or editing a task, select one or more prerequisite tasks from the "Dependencies" dropdown
+- **Dependency Validation**: The system prevents circular dependencies and warns if start dates conflict with dependencies
+- **Visual Indicators**: 
+  - Dependency arrows show relationships in the Gantt chart
+  - Blocked tasks (with incomplete dependencies) are dimmed and show a 🔒 icon
+  - Next tasks (ready to work on) pulse with a highlight
+- **Auto-Update**: When a task's end date changes, dependent tasks automatically shift their dates
+
+### Next Tasks Panel
+
+- **🎯 Next Tasks**: A dedicated panel shows tasks that are ready to work on
+- Tasks appear here when all their dependencies are completed
+- Click any task in the panel to quickly open and edit it
+- See which tasks are blocking others with the "Blocks N tasks" indicator
 
 ### Viewing Tasks
 

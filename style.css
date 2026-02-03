@@ -690,3 +690,189 @@ button {
 .mt-20 {
     margin-top: 20px;
 }
+
+/* Next Tasks Panel */
+.next-tasks-panel {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.next-tasks-panel h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.next-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.next-task-item {
+    background: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding: 12px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.next-task-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.next-task-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.next-task-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.next-task-user {
+    display: inline-flex;
+    align-items: center;
+}
+
+.next-task-user::before {
+    content: '👤';
+    margin-right: 4px;
+}
+
+.next-task-date {
+    display: inline-flex;
+    align-items: center;
+}
+
+.next-task-date::before {
+    content: '📅';
+    margin-right: 4px;
+}
+
+.next-task-impact {
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: #fff3cd;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #856404;
+    display: inline-block;
+}
+
+.next-tasks-empty {
+    text-align: center;
+    color: #999;
+    padding: 15px;
+    font-style: italic;
+}
+
+/* Dependency Selection in Modal */
+#task-dependencies {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+#task-dependencies:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-help {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Gantt Chart Enhancements */
+.bar-blocked {
+    opacity: 0.6;
+    filter: grayscale(0.3);
+}
+
+.bar-blocked::after {
+    content: '🔒';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+}
+
+.bar-next-task {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.2);
+    }
+}
+
+/* Gantt Popup Enhancements */
+.gantt-popup {
+    max-width: 350px;
+}
+
+.gantt-popup ul {
+    margin: 5px 0 0 20px;
+    padding: 0;
+}
+
+.gantt-popup li {
+    margin: 3px 0;
+    font-size: 13px;
+}
+
+.popup-blocked {
+    color: #dc3545;
+    font-weight: 600;
+    padding: 5px;
+    background: #f8d7da;
+    border-radius: 4px;
+    margin: 5px 0;
+}
+
+/* Dependency Lines */
+#dependency-svg {
+    overflow: visible;
+}
+
+/* Mobile Responsiveness for New Features */
+@media (max-width: 768px) {
+    .next-tasks-panel {
+        padding: 15px;
+    }
+
+    .next-task-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .next-task-impact {
+        font-size: 11px;
+    }
+}
