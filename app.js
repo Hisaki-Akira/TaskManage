@@ -8,7 +8,7 @@ class TaskManager {
         this.ganttViewMode = 'Week';
         this.editingTaskId = null;
         this.unsubscribeSnapshot = null;
-        this.UNASSIGNED_USER = 'Unassigned';
+        this.UNASSIGNED_USER = '未割り当て';
         
         this.init();
     }
@@ -55,7 +55,7 @@ class TaskManager {
         const password = document.getElementById('login-password').value;
 
         if (!email || !password) {
-            this.showAuthError('Please enter both email and password');
+            this.showAuthError('メールアドレスとパスワードを入力してください');
             return;
         }
 
@@ -75,12 +75,12 @@ class TaskManager {
         const password = document.getElementById('signup-password').value;
 
         if (!email || !password) {
-            this.showAuthError('Please enter both email and password');
+            this.showAuthError('メールアドレスとパスワードを入力してください');
             return;
         }
 
         if (password.length < 6) {
-            this.showAuthError('Password must be at least 6 characters');
+            this.showAuthError('パスワードは6文字以上である必要があります');
             return;
         }
 
@@ -108,21 +108,21 @@ class TaskManager {
         } catch (error) {
             this.showLoading(false);
             console.error('Sign out error:', error);
-            alert('Error signing out. Please try again.');
+            alert('サインアウト中にエラーが発生しました。もう一度お試しください。');
         }
     }
 
     getAuthErrorMessage(errorCode) {
         const errorMessages = {
-            'auth/invalid-email': 'Invalid email address',
-            'auth/user-disabled': 'This account has been disabled',
-            'auth/user-not-found': 'No account found with this email',
-            'auth/wrong-password': 'Incorrect password',
-            'auth/email-already-in-use': 'Email already in use',
-            'auth/weak-password': 'Password is too weak',
-            'auth/network-request-failed': 'Network error. Please check your connection',
+            'auth/invalid-email': 'メールアドレスが無効です',
+            'auth/user-disabled': 'このアカウントは無効になっています',
+            'auth/user-not-found': 'このメールアドレスのアカウントが見つかりません',
+            'auth/wrong-password': 'パスワードが正しくありません',
+            'auth/email-already-in-use': 'このメールアドレスは既に使用されています',
+            'auth/weak-password': 'パスワードが弱すぎます',
+            'auth/network-request-failed': 'ネットワークエラーです。接続を確認してください',
         };
-        return errorMessages[errorCode] || 'An error occurred. Please try again.';
+        return errorMessages[errorCode] || 'エラーが発生しました。もう一度お試しください。';
     }
 
     // UI Methods
@@ -151,8 +151,8 @@ class TaskManager {
     openTaskModal() {
         this.resetForm();
         document.getElementById('task-modal').classList.remove('hidden');
-        document.getElementById('modal-title').textContent = 'Create New Task';
-        document.getElementById('submit-btn').textContent = 'Create Task';
+        document.getElementById('modal-title').textContent = '新しいタスクを作成';
+        document.getElementById('submit-btn').textContent = 'タスクを作成';
         // Prevent body scroll when modal is open
         document.body.style.overflow = 'hidden';
     }
@@ -172,13 +172,13 @@ class TaskManager {
         if (this.currentView === 'gantt') {
             ganttView.classList.add('hidden');
             listView.classList.remove('hidden');
-            toggleBtn.textContent = 'Switch to Gantt View';
+            toggleBtn.textContent = 'ガント表示に切り替え';
             this.currentView = 'list';
             this.renderTaskList();
         } else {
             ganttView.classList.remove('hidden');
             listView.classList.add('hidden');
-            toggleBtn.textContent = 'Switch to List View';
+            toggleBtn.textContent = 'リスト表示に切り替え';
             this.currentView = 'gantt';
             this.renderGanttChart();
         }
@@ -208,7 +208,7 @@ class TaskManager {
             }, error => {
                 console.error('Error loading tasks:', error);
                 this.showLoading(false);
-                alert('Error loading tasks. Please refresh the page.');
+                alert('タスクの読み込み中にエラーが発生しました。ページを更新してください。');
             });
     }
 
@@ -225,13 +225,13 @@ class TaskManager {
         const description = document.getElementById('task-description').value.trim();
 
         if (!title || !userName || !startDate || !endDate) {
-            alert('Please fill in all required fields');
+            alert('必須項目をすべて入力してください');
             return;
         }
 
         // Validate dates
         if (new Date(endDate) < new Date(startDate)) {
-            alert('End date cannot be before start date');
+            alert('終了日は開始日より前にできません');
             return;
         }
 
@@ -263,7 +263,7 @@ class TaskManager {
         } catch (error) {
             console.error('Error saving task:', error);
             this.showLoading(false);
-            alert('Error saving task. Please try again.');
+            alert('タスクの保存中にエラーが発生しました。もう一度お試しください。');
         }
     }
 
@@ -282,8 +282,8 @@ class TaskManager {
         document.getElementById('task-status').value = task.status;
         document.getElementById('task-description').value = task.description || '';
         
-        document.getElementById('modal-title').textContent = 'Edit Task';
-        document.getElementById('submit-btn').textContent = 'Update Task';
+        document.getElementById('modal-title').textContent = 'タスクを編集';
+        document.getElementById('submit-btn').textContent = 'タスクを更新';
         
         // Open modal
         document.getElementById('task-modal').classList.remove('hidden');
@@ -291,7 +291,7 @@ class TaskManager {
     }
 
     async deleteTask(taskId) {
-        if (!confirm('Are you sure you want to delete this task?')) {
+        if (!confirm('このタスクを削除してもよろしいですか？')) {
             return;
         }
 
@@ -302,7 +302,7 @@ class TaskManager {
         } catch (error) {
             console.error('Error deleting task:', error);
             this.showLoading(false);
-            alert('Error deleting task. Please try again.');
+            alert('タスクの削除中にエラーが発生しました。もう一度お試しください。');
         }
     }
 
@@ -310,8 +310,8 @@ class TaskManager {
         this.editingTaskId = null;
         document.getElementById('task-form').reset();
         document.getElementById('task-id').value = '';
-        document.getElementById('modal-title').textContent = 'Create New Task';
-        document.getElementById('submit-btn').textContent = 'Create Task';
+        document.getElementById('modal-title').textContent = '新しいタスクを作成';
+        document.getElementById('submit-btn').textContent = 'タスクを作成';
     }
 
     // Gantt Chart Methods
@@ -319,7 +319,7 @@ class TaskManager {
         const container = document.getElementById('gantt-container');
         
         if (this.tasks.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No tasks yet. Create your first task above!</p>';
+            container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">まだタスクがありません。上のボタンから最初のタスクを作成してください！</p>';
             return;
         }
 
@@ -357,7 +357,7 @@ class TaskManager {
             
             const userHeader = document.createElement('div');
             userHeader.className = 'gantt-user-header';
-            userHeader.innerHTML = `<h3>${this.escapeHtml(userName)}</h3><span class="task-count">${tasksByUser[userName].length} task(s)</span>`;
+            userHeader.innerHTML = `<h3>${this.escapeHtml(userName)}</h3><span class="task-count">${tasksByUser[userName].length} タスク</span>`;
             userSection.appendChild(userHeader);
             
             const userGanttContainer = document.createElement('div');
@@ -398,11 +398,11 @@ class TaskManager {
                     return `
                         <div class="gantt-popup">
                             <h3>${task.name}</h3>
-                            ${taskData.userName ? `<p><strong>User:</strong> ${taskData.userName}</p>` : ''}
-                            ${taskData.assignee ? `<p><strong>Assignee:</strong> ${taskData.assignee}</p>` : ''}
-                            <p><strong>Status:</strong> ${taskData.status}</p>
-                            <p><strong>Duration:</strong> ${task.start} - ${task.end}</p>
-                            ${taskData.description ? `<p><strong>Description:</strong> ${taskData.description}</p>` : ''}
+                            ${taskData.userName ? `<p><strong>ユーザー:</strong> ${taskData.userName}</p>` : ''}
+                            ${taskData.assignee ? `<p><strong>担当者:</strong> ${taskData.assignee}</p>` : ''}
+                            <p><strong>状態:</strong> ${this.translateStatus(taskData.status)}</p>
+                            <p><strong>期間:</strong> ${task.start} - ${task.end}</p>
+                            ${taskData.description ? `<p><strong>説明:</strong> ${taskData.description}</p>` : ''}
                         </div>
                     `;
                 },
@@ -440,7 +440,7 @@ class TaskManager {
             });
         } catch (error) {
             console.error('Error rendering Gantt chart for user:', error);
-            container.innerHTML = '<p style="text-align: center; color: #c33; padding: 20px;">Error rendering Gantt chart.</p>';
+            container.innerHTML = '<p style="text-align: center; color: #c33; padding: 20px;">ガントチャートの描画中にエラーが発生しました。</p>';
         }
     }
 
@@ -468,11 +468,11 @@ class TaskManager {
                     return `
                         <div class="gantt-popup">
                             <h3>${task.name}</h3>
-                            ${taskData.userName ? `<p><strong>User:</strong> ${taskData.userName}</p>` : ''}
-                            ${taskData.assignee ? `<p><strong>Assignee:</strong> ${taskData.assignee}</p>` : ''}
-                            <p><strong>Status:</strong> ${taskData.status}</p>
-                            <p><strong>Duration:</strong> ${task.start} - ${task.end}</p>
-                            ${taskData.description ? `<p><strong>Description:</strong> ${taskData.description}</p>` : ''}
+                            ${taskData.userName ? `<p><strong>ユーザー:</strong> ${taskData.userName}</p>` : ''}
+                            ${taskData.assignee ? `<p><strong>担当者:</strong> ${taskData.assignee}</p>` : ''}
+                            <p><strong>状態:</strong> ${this.translateStatus(taskData.status)}</p>
+                            <p><strong>期間:</strong> ${task.start} - ${task.end}</p>
+                            ${taskData.description ? `<p><strong>説明:</strong> ${taskData.description}</p>` : ''}
                         </div>
                     `;
                 },
@@ -489,7 +489,7 @@ class TaskManager {
                         });
                     } catch (error) {
                         console.error('Error updating task dates:', error);
-                        alert('Error updating task dates');
+                        alert('タスクの日付更新中にエラーが発生しました');
                     }
                 },
                 on_progress_change: async (task, progress) => {
@@ -510,7 +510,7 @@ class TaskManager {
             });
         } catch (error) {
             console.error('Error rendering Gantt chart:', error);
-            container.innerHTML = '<p style="text-align: center; color: #c33; padding: 40px;">Error rendering Gantt chart. Please try refreshing the page.</p>';
+            container.innerHTML = '<p style="text-align: center; color: #c33; padding: 40px;">ガントチャートの描画中にエラーが発生しました。ページを更新してください。</p>';
         }
     }
 
@@ -549,12 +549,25 @@ class TaskManager {
         return classMap[status] || '';
     }
 
+    // Translation helper for status display
+    // Note: Status values are stored in English in the database for data compatibility
+    // This function translates them to Japanese for UI display only
+    translateStatus(status) {
+        const statusTranslations = {
+            'Not Started': '未着手',
+            'In Progress': '進行中',
+            'Completed': '完了',
+            'On Hold': '保留'
+        };
+        return statusTranslations[status] || status;
+    }
+
     // List View Methods
     renderTaskList() {
         const container = document.getElementById('task-list');
         
         if (this.tasks.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No tasks yet. Create your first task above!</p>';
+            container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">まだタスクがありません。上のボタンから最初のタスクを作成してください！</p>';
             return;
         }
 
@@ -564,20 +577,20 @@ class TaskManager {
                     <div>
                         <div class="task-item-title">${this.escapeHtml(task.title)}</div>
                         <span class="task-item-status status-${this.getStatusSlug(task.status)}">
-                            ${task.status}
+                            ${this.translateStatus(task.status)}
                         </span>
                     </div>
                 </div>
                 <div class="task-item-details">
-                    ${task.userName ? `<div class="task-item-detail"><strong>User:</strong> ${this.escapeHtml(task.userName)}</div>` : ''}
-                    ${task.assignee ? `<div class="task-item-detail"><strong>Assignee:</strong> ${this.escapeHtml(task.assignee)}</div>` : ''}
-                    <div class="task-item-detail"><strong>Start Date:</strong> ${task.startDate}</div>
-                    <div class="task-item-detail"><strong>End Date:</strong> ${task.endDate}</div>
-                    ${task.description ? `<div class="task-item-detail"><strong>Description:</strong> ${this.escapeHtml(task.description)}</div>` : ''}
+                    ${task.userName ? `<div class="task-item-detail"><strong>ユーザー:</strong> ${this.escapeHtml(task.userName)}</div>` : ''}
+                    ${task.assignee ? `<div class="task-item-detail"><strong>担当者:</strong> ${this.escapeHtml(task.assignee)}</div>` : ''}
+                    <div class="task-item-detail"><strong>開始日:</strong> ${task.startDate}</div>
+                    <div class="task-item-detail"><strong>終了日:</strong> ${task.endDate}</div>
+                    ${task.description ? `<div class="task-item-detail"><strong>説明:</strong> ${this.escapeHtml(task.description)}</div>` : ''}
                 </div>
                 <div class="task-item-actions">
-                    <button class="btn-edit" onclick="app.editTask('${task.id}')">Edit</button>
-                    <button class="btn-danger" onclick="app.deleteTask('${task.id}')">Delete</button>
+                    <button class="btn-edit" onclick="app.editTask('${task.id}')">編集</button>
+                    <button class="btn-danger" onclick="app.deleteTask('${task.id}')">削除</button>
                 </div>
             </div>
         `).join('');

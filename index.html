@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager - FTC SIT-Kashiwa</title>
+    <title>タスク管理 - FTC SIT-Kashiwa</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.css">
 </head>
@@ -11,23 +11,23 @@
     <!-- Auth Container -->
     <div id="auth-container" class="auth-container">
         <div class="auth-box">
-            <h1>Task Manager</h1>
+            <h1>タスク管理</h1>
             <p class="subtitle">FTC Member - SIT-Kashiwa</p>
             
             <div id="login-form" class="auth-form">
-                <h2>Sign In</h2>
-                <input type="email" id="login-email" placeholder="Email" required>
-                <input type="password" id="login-password" placeholder="Password" required>
-                <button onclick="app.signIn()">Sign In</button>
-                <p class="toggle-auth">Don't have an account? <a href="#" onclick="app.toggleAuthForm(); return false;">Sign Up</a></p>
+                <h2>サインイン</h2>
+                <input type="email" id="login-email" placeholder="メールアドレス" required>
+                <input type="password" id="login-password" placeholder="パスワード" required>
+                <button onclick="app.signIn()">サインイン</button>
+                <p class="toggle-auth">アカウントをお持ちでない方は <a href="#" onclick="app.toggleAuthForm(); return false;">サインアップ</a></p>
             </div>
             
             <div id="signup-form" class="auth-form hidden">
-                <h2>Sign Up</h2>
-                <input type="email" id="signup-email" placeholder="Email" required>
-                <input type="password" id="signup-password" placeholder="Password (min 6 characters)" required>
-                <button onclick="app.signUp()">Sign Up</button>
-                <p class="toggle-auth">Already have an account? <a href="#" onclick="app.toggleAuthForm(); return false;">Sign In</a></p>
+                <h2>サインアップ</h2>
+                <input type="email" id="signup-email" placeholder="メールアドレス" required>
+                <input type="password" id="signup-password" placeholder="パスワード（6文字以上）" required>
+                <button onclick="app.signUp()">サインアップ</button>
+                <p class="toggle-auth">すでにアカウントをお持ちの方は <a href="#" onclick="app.toggleAuthForm(); return false;">サインイン</a></p>
             </div>
             
             <div id="auth-error" class="error-message"></div>
@@ -39,12 +39,12 @@
         <!-- Header -->
         <header class="app-header">
             <div class="header-left">
-                <h1>Task Manager</h1>
+                <h1>タスク管理</h1>
                 <span class="user-email" id="user-email"></span>
             </div>
             <div class="header-right">
-                <button onclick="app.toggleView()" id="view-toggle-btn" class="btn-secondary">Switch to List View</button>
-                <button onclick="app.signOut()" class="btn-secondary">Sign Out</button>
+                <button onclick="app.toggleView()" id="view-toggle-btn" class="btn-secondary">リスト表示に切り替え</button>
+                <button onclick="app.signOut()" class="btn-secondary">サインアウト</button>
             </div>
         </header>
 
@@ -53,18 +53,18 @@
             <!-- Add Task Button -->
             <div class="add-task-button-container">
                 <button onclick="app.openTaskModal()" class="btn-primary btn-add-task">
-                    ➕ Add Task
+                    ➕ タスクを追加
                 </button>
             </div>
 
             <!-- Gantt Chart View -->
             <div id="gantt-view" class="gantt-view">
                 <div class="view-header">
-                    <h2>Gantt Chart</h2>
+                    <h2>ガントチャート</h2>
                     <div class="gantt-controls">
-                        <button onclick="app.changeGanttView('Day')" class="btn-view">Day</button>
-                        <button onclick="app.changeGanttView('Week')" class="btn-view active">Week</button>
-                        <button onclick="app.changeGanttView('Month')" class="btn-view">Month</button>
+                        <button onclick="app.changeGanttView('Day')" class="btn-view">日</button>
+                        <button onclick="app.changeGanttView('Week')" class="btn-view active">週</button>
+                        <button onclick="app.changeGanttView('Month')" class="btn-view">月</button>
                     </div>
                 </div>
                 <div id="gantt-container"></div>
@@ -72,7 +72,7 @@
 
             <!-- Task List View -->
             <div id="list-view" class="list-view hidden">
-                <h2>Task List</h2>
+                <h2>タスクリスト</h2>
                 <div class="task-list" id="task-list">
                     <!-- Tasks will be rendered here -->
                 </div>
@@ -90,7 +90,7 @@
         <div class="modal-overlay" onclick="app.closeTaskModal()"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modal-title">Create New Task</h2>
+                <h2 id="modal-title">新しいタスクを作成</h2>
                 <button class="modal-close" onclick="app.closeTaskModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -98,50 +98,51 @@
                     <input type="hidden" id="task-id">
                     
                     <div class="form-group">
-                        <label for="task-title">Title *</label>
+                        <label for="task-title">タイトル *</label>
                         <input type="text" id="task-title" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="task-user-name">User Name *</label>
-                        <input type="text" id="task-user-name" placeholder="e.g., John Doe" required>
+                        <label for="task-user-name">ユーザー名 *</label>
+                        <input type="text" id="task-user-name" placeholder="例：山田太郎" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="task-assignee">Assignee</label>
-                        <input type="text" id="task-assignee" placeholder="e.g., Jane Smith">
+                        <label for="task-assignee">担当者</label>
+                        <input type="text" id="task-assignee" placeholder="例：佐藤花子">
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="task-start-date">Start Date *</label>
+                            <label for="task-start-date">開始日 *</label>
                             <input type="date" id="task-start-date" required>
                         </div>
                         
                         <div class="form-group">
-                            <label for="task-end-date">End Date *</label>
+                            <label for="task-end-date">終了日 *</label>
                             <input type="date" id="task-end-date" required>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="task-status">Status</label>
+                        <label for="task-status">状態</label>
+                        <!-- Status values stored in English for database compatibility, displayed in Japanese -->
                         <select id="task-status">
-                            <option value="Not Started">Not Started</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Completed">Completed</option>
-                            <option value="On Hold">On Hold</option>
+                            <option value="Not Started">未着手</option>
+                            <option value="In Progress">進行中</option>
+                            <option value="Completed">完了</option>
+                            <option value="On Hold">保留</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="task-description">Description</label>
-                        <textarea id="task-description" rows="3" placeholder="Task details..."></textarea>
+                        <label for="task-description">説明</label>
+                        <textarea id="task-description" rows="3" placeholder="タスクの詳細..."></textarea>
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary" id="submit-btn">Create Task</button>
-                        <button type="button" class="btn-secondary" onclick="app.closeTaskModal()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="submit-btn">タスクを作成</button>
+                        <button type="button" class="btn-secondary" onclick="app.closeTaskModal()">キャンセル</button>
                     </div>
                 </form>
             </div>
