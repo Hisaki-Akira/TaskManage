@@ -50,9 +50,50 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Task Form -->
-            <div class="task-form-container">
-                <h2 id="form-title">Create New Task</h2>
+            <!-- Add Task Button -->
+            <div class="add-task-button-container">
+                <button onclick="app.openTaskModal()" class="btn-primary btn-add-task">
+                    ➕ Add Task
+                </button>
+            </div>
+
+            <!-- Gantt Chart View -->
+            <div id="gantt-view" class="gantt-view">
+                <div class="view-header">
+                    <h2>Gantt Chart</h2>
+                    <div class="gantt-controls">
+                        <button onclick="app.changeGanttView('Day')" class="btn-view">Day</button>
+                        <button onclick="app.changeGanttView('Week')" class="btn-view active">Week</button>
+                        <button onclick="app.changeGanttView('Month')" class="btn-view">Month</button>
+                    </div>
+                </div>
+                <div id="gantt-container"></div>
+            </div>
+
+            <!-- Task List View -->
+            <div id="list-view" class="list-view hidden">
+                <h2>Task List</h2>
+                <div class="task-list" id="task-list">
+                    <!-- Tasks will be rendered here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal hidden">
+        <div class="modal-overlay" onclick="app.closeTaskModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Create New Task</h2>
+                <button class="modal-close" onclick="app.closeTaskModal()">&times;</button>
+            </div>
+            <div class="modal-body">
                 <form id="task-form" onsubmit="app.handleTaskSubmit(event)">
                     <input type="hidden" id="task-id">
                     
@@ -100,37 +141,11 @@
                     
                     <div class="form-actions">
                         <button type="submit" class="btn-primary" id="submit-btn">Create Task</button>
-                        <button type="button" class="btn-secondary" onclick="app.cancelEdit()">Cancel</button>
+                        <button type="button" class="btn-secondary" onclick="app.closeTaskModal()">Cancel</button>
                     </div>
                 </form>
             </div>
-
-            <!-- Gantt Chart View -->
-            <div id="gantt-view" class="gantt-view">
-                <div class="view-header">
-                    <h2>Gantt Chart</h2>
-                    <div class="gantt-controls">
-                        <button onclick="app.changeGanttView('Day')" class="btn-view">Day</button>
-                        <button onclick="app.changeGanttView('Week')" class="btn-view active">Week</button>
-                        <button onclick="app.changeGanttView('Month')" class="btn-view">Month</button>
-                    </div>
-                </div>
-                <div id="gantt-container"></div>
-            </div>
-
-            <!-- Task List View -->
-            <div id="list-view" class="list-view hidden">
-                <h2>Task List</h2>
-                <div class="task-list" id="task-list">
-                    <!-- Tasks will be rendered here -->
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div id="loading" class="loading hidden">
-        <div class="spinner"></div>
+        </div>
     </div>
 
     <!-- Firebase SDK -->

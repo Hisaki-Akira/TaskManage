@@ -147,6 +147,22 @@ class TaskManager {
         }
     }
 
+    openTaskModal() {
+        this.resetForm();
+        document.getElementById('task-modal').classList.remove('hidden');
+        document.getElementById('modal-title').textContent = 'Create New Task';
+        document.getElementById('submit-btn').textContent = 'Create Task';
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeTaskModal() {
+        document.getElementById('task-modal').classList.add('hidden');
+        this.resetForm();
+        // Restore body scroll
+        document.body.style.overflow = '';
+    }
+
     toggleView() {
         const ganttView = document.getElementById('gantt-view');
         const listView = document.getElementById('list-view');
@@ -241,7 +257,7 @@ class TaskManager {
                 await db.collection('tasks').add(taskData);
             }
             
-            this.resetForm();
+            this.closeTaskModal();
             this.showLoading(false);
         } catch (error) {
             console.error('Error saving task:', error);
@@ -265,11 +281,12 @@ class TaskManager {
         document.getElementById('task-status').value = task.status;
         document.getElementById('task-description').value = task.description || '';
         
-        document.getElementById('form-title').textContent = 'Edit Task';
+        document.getElementById('modal-title').textContent = 'Edit Task';
         document.getElementById('submit-btn').textContent = 'Update Task';
         
-        // Scroll to form
-        document.querySelector('.task-form-container').scrollIntoView({ behavior: 'smooth' });
+        // Open modal
+        document.getElementById('task-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
     }
 
     async deleteTask(taskId) {
@@ -288,15 +305,11 @@ class TaskManager {
         }
     }
 
-    cancelEdit() {
-        this.resetForm();
-    }
-
     resetForm() {
         this.editingTaskId = null;
         document.getElementById('task-form').reset();
         document.getElementById('task-id').value = '';
-        document.getElementById('form-title').textContent = 'Create New Task';
+        document.getElementById('modal-title').textContent = 'Create New Task';
         document.getElementById('submit-btn').textContent = 'Create Task';
     }
 
