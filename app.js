@@ -400,7 +400,7 @@ class TaskManager {
                             <h3>${task.name}</h3>
                             ${taskData.userName ? `<p><strong>ユーザー:</strong> ${taskData.userName}</p>` : ''}
                             ${taskData.assignee ? `<p><strong>担当者:</strong> ${taskData.assignee}</p>` : ''}
-                            <p><strong>状態:</strong> ${taskData.status}</p>
+                            <p><strong>状態:</strong> ${this.translateStatus(taskData.status)}</p>
                             <p><strong>期間:</strong> ${task.start} - ${task.end}</p>
                             ${taskData.description ? `<p><strong>説明:</strong> ${taskData.description}</p>` : ''}
                         </div>
@@ -424,9 +424,9 @@ class TaskManager {
                 },
                 on_progress_change: async (task, progress) => {
                     // Update task progress/status
-                    let status = '未着手';
-                    if (progress >= 100) status = '完了';
-                    else if (progress > 0) status = '進行中';
+                    let status = 'Not Started';
+                    if (progress >= 100) status = 'Completed';
+                    else if (progress > 0) status = 'In Progress';
                     
                     try {
                         await db.collection('tasks').doc(task.id).update({
@@ -470,7 +470,7 @@ class TaskManager {
                             <h3>${task.name}</h3>
                             ${taskData.userName ? `<p><strong>ユーザー:</strong> ${taskData.userName}</p>` : ''}
                             ${taskData.assignee ? `<p><strong>担当者:</strong> ${taskData.assignee}</p>` : ''}
-                            <p><strong>状態:</strong> ${taskData.status}</p>
+                            <p><strong>状態:</strong> ${this.translateStatus(taskData.status)}</p>
                             <p><strong>期間:</strong> ${task.start} - ${task.end}</p>
                             ${taskData.description ? `<p><strong>説明:</strong> ${taskData.description}</p>` : ''}
                         </div>
@@ -494,9 +494,9 @@ class TaskManager {
                 },
                 on_progress_change: async (task, progress) => {
                     // Update task progress/status
-                    let status = '未着手';
-                    if (progress >= 100) status = '完了';
-                    else if (progress > 0) status = '進行中';
+                    let status = 'Not Started';
+                    if (progress >= 100) status = 'Completed';
+                    else if (progress > 0) status = 'In Progress';
                     
                     try {
                         await db.collection('tasks').doc(task.id).update({
@@ -531,22 +531,33 @@ class TaskManager {
 
     getProgressFromStatus(status) {
         const progressMap = {
-            '未着手': 0,
-            '進行中': 50,
-            '完了': 100,
-            '保留': 25
+            'Not Started': 0,
+            'In Progress': 50,
+            'Completed': 100,
+            'On Hold': 25
         };
         return progressMap[status] || 0;
     }
 
     getStatusClass(status) {
         const classMap = {
-            '未着手': 'bar-not-started',
-            '進行中': 'bar-in-progress',
-            '完了': 'bar-completed',
-            '保留': 'bar-on-hold'
+            'Not Started': 'bar-not-started',
+            'In Progress': 'bar-in-progress',
+            'Completed': 'bar-completed',
+            'On Hold': 'bar-on-hold'
         };
         return classMap[status] || '';
+    }
+
+    // Translation helper for status display
+    translateStatus(status) {
+        const statusTranslations = {
+            'Not Started': '未着手',
+            'In Progress': '進行中',
+            'Completed': '完了',
+            'On Hold': '保留'
+        };
+        return statusTranslations[status] || status;
     }
 
     // List View Methods
@@ -564,7 +575,7 @@ class TaskManager {
                     <div>
                         <div class="task-item-title">${this.escapeHtml(task.title)}</div>
                         <span class="task-item-status status-${this.getStatusSlug(task.status)}">
-                            ${task.status}
+                            ${this.translateStatus(task.status)}
                         </span>
                     </div>
                 </div>
