@@ -256,9 +256,14 @@ class TaskManager {
             .onSnapshot(snapshot => {
                 this.tasks = [];
                 snapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Ensure dependencies field exists for backward compatibility
+                    if (!data.dependencies) {
+                        data.dependencies = [];
+                    }
                     this.tasks.push({
                         id: doc.id,
-                        ...doc.data()
+                        ...data
                     });
                 });
                 
@@ -407,7 +412,7 @@ class TaskManager {
         const checkboxes = document.querySelectorAll('.dependency-checkbox:checked');
         const dependencies = [];
         checkboxes.forEach(cb => dependencies.push(cb.value));
-        return dependencies;
+        return dependencies.length > 0 ? dependencies : [];
     }
 
     // Dependency and scheduling methods
