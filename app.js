@@ -282,7 +282,7 @@ class TaskManager {
         
         document.getElementById('task-id').value = taskId;
         document.getElementById('task-title').value = task.title;
-        document.getElementById('task-username').value = task.username || '';
+        document.getElementById('task-username').value = task.username || 'Unknown User';
         document.getElementById('task-assignee').value = task.assignee || '';
         document.getElementById('task-start-date').value = task.startDate;
         document.getElementById('task-end-date').value = task.endDate;
@@ -337,7 +337,7 @@ class TaskManager {
         // Group tasks by username
         const userGroups = {};
         this.tasks.forEach(task => {
-            const username = task.username || 'Unassigned';
+            const username = task.username || 'Unknown User';
             if (!userGroups[username]) {
                 userGroups[username] = [];
             }
