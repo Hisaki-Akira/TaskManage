@@ -6,7 +6,8 @@ This document shows example tasks you can create to test the Task Manager applic
 
 ### Task 1: Project Kickoff
 - **Title**: Project Kickoff Meeting
-- **Assignee**: Team Lead
+- **User Name**: Team Lead
+- **Assignee**: Product Manager
 - **Start Date**: 2026-02-03
 - **End Date**: 2026-02-03
 - **Status**: Completed
@@ -14,7 +15,8 @@ This document shows example tasks you can create to test the Task Manager applic
 
 ### Task 2: Requirements Gathering
 - **Title**: Gather Project Requirements
-- **Assignee**: Product Manager
+- **User Name**: Product Manager
+- **Assignee**: Business Analyst
 - **Start Date**: 2026-02-04
 - **End Date**: 2026-02-10
 - **Status**: In Progress
@@ -22,7 +24,8 @@ This document shows example tasks you can create to test the Task Manager applic
 
 ### Task 3: Design Phase
 - **Title**: Create System Design
-- **Assignee**: System Architect
+- **User Name**: System Architect
+- **Assignee**: Tech Lead
 - **Start Date**: 2026-02-11
 - **End Date**: 2026-02-17
 - **Status**: Not Started
@@ -30,7 +33,8 @@ This document shows example tasks you can create to test the Task Manager applic
 
 ### Task 4: Frontend Development
 - **Title**: Develop User Interface
-- **Assignee**: Frontend Developer
+- **User Name**: Frontend Developer
+- **Assignee**: UI/UX Designer
 - **Start Date**: 2026-02-18
 - **End Date**: 2026-02-28
 - **Status**: Not Started
@@ -38,7 +42,8 @@ This document shows example tasks you can create to test the Task Manager applic
 
 ### Task 5: Backend Development
 - **Title**: Build Backend APIs
-- **Assignee**: Backend Developer
+- **User Name**: Backend Developer
+- **Assignee**: Database Admin
 - **Start Date**: 2026-02-18
 - **End Date**: 2026-02-28
 - **Status**: Not Started
@@ -46,7 +51,8 @@ This document shows example tasks you can create to test the Task Manager applic
 
 ### Task 6: Testing
 - **Title**: Quality Assurance Testing
-- **Assignee**: QA Engineer
+- **User Name**: QA Engineer
+- **Assignee**: Test Automation Engineer
 - **Start Date**: 2026-03-01
 - **End Date**: 2026-03-07
 - **Status**: Not Started
@@ -54,7 +60,8 @@ This document shows example tasks you can create to test the Task Manager applic
 
 ### Task 7: Documentation
 - **Title**: Write User Documentation
-- **Assignee**: Technical Writer
+- **User Name**: Technical Writer
+- **Assignee**: Product Manager
 - **Start Date**: 2026-03-01
 - **End Date**: 2026-03-05
 - **Status**: Not Started
@@ -62,7 +69,8 @@ This document shows example tasks you can create to test the Task Manager applic
 
 ### Task 8: Deployment
 - **Title**: Deploy to Production
-- **Assignee**: DevOps Engineer
+- **User Name**: DevOps Engineer
+- **Assignee**: System Administrator
 - **Start Date**: 2026-03-08
 - **End Date**: 2026-03-08
 - **Status**: Not Started
@@ -75,7 +83,8 @@ Each task in Firestore has the following structure:
 ```javascript
 {
   title: "Task Title",              // String, required
-  assignee: "Person Name",          // String, optional
+  userName: "John Doe",             // String, required - User responsible for the task
+  assignee: "Jane Smith",           // String, optional - Person assigned to help/review
   startDate: "2026-02-03",         // String (YYYY-MM-DD), required
   endDate: "2026-02-10",           // String (YYYY-MM-DD), required
   status: "In Progress",            // String, one of: "Not Started", "In Progress", "Completed", "On Hold"
@@ -84,6 +93,11 @@ Each task in Firestore has the following structure:
   updatedAt: Timestamp              // Firebase Timestamp, auto-updated
 }
 ```
+
+### User Name vs Assignee
+
+- **User Name** (required): The primary person responsible for this task. Tasks are grouped by user name in the Gantt chart view.
+- **Assignee** (optional): A secondary person who may be helping or reviewing the task. This is useful for collaborative work.
 
 ## Status Options
 
@@ -125,9 +139,11 @@ The application supports four task statuses:
 - Leave buffer time for unexpected delays
 
 ### Assignees
+
 - Use consistent naming (e.g., always "John Smith", not "John" or "J. Smith")
-- Assign one person per task (split if needed)
-- Leave blank if unassigned
+- **User Name** is the primary person responsible - this field is required
+- **Assignee** is optional and used for secondary people (reviewers, helpers)
+- Leave assignee blank if no secondary person is needed
 
 ### Descriptions
 - Include acceptance criteria

@@ -322,6 +322,123 @@ class TaskManager {
             return;
         }
 
+        // Group tasks by userName
+        const tasksByUser = this.groupTasksByUser();
+        
+        // If we have users, render grouped view; otherwise fallback to standard view
+        if (Object.keys(tasksByUser).length > 0) {
+            this.renderUserGroupedGantt(container, tasksByUser);
+        } else {
+            this.renderStandardGantt(container);
+        }
+    }
+
+    groupTasksByUser() {
+        const tasksByUser = {};
+        this.tasks.forEach(task => {
+            const userName = task.userName || 'Unassigned';
+            if (!tasksByUser[userName]) {
+                tasksByUser[userName] = [];
+            }
+            tasksByUser[userName].push(task);
+        });
+        return tasksByUser;
+    }
+
+    renderUserGroupedGantt(container, tasksByUser) {
+        container.innerHTML = '';
+        
+        // Create a container for each user
+        const users = Object.keys(tasksByUser).sort();
+        users.forEach(userName => {
+            const userSection = document.createElement('div');
+            userSection.className = 'gantt-user-section';
+            
+            const userHeader = document.createElement('div');
+            userHeader.className = 'gantt-user-header';
+            userHeader.innerHTML = `<h3>${this.escapeHtml(userName)}</h3><span class="task-count">${tasksByUser[userName].length} task(s)</span>`;
+            userSection.appendChild(userHeader);
+            
+            const userGanttContainer = document.createElement('div');
+            userGanttContainer.className = 'gantt-user-container';
+            userGanttContainer.id = `gantt-user-${userName.replace(/\s+/g, '-')}`;
+            userSection.appendChild(userGanttContainer);
+            
+            container.appendChild(userSection);
+            
+            // Render Gantt chart for this user's tasks
+            this.renderGanttForUser(userGanttContainer, tasksByUser[userName]);
+        });
+    }
+
+    renderGanttForUser(container, tasks) {
+        // Convert tasks to Gantt format
+        const ganttTasks = tasks.map(task => ({
+            id: task.id,
+            name: task.title,
+            start: task.startDate,
+            end: task.endDate,
+            progress: this.getProgressFromStatus(task.status),
+            custom_class: this.getStatusClass(task.status)
+        }));
+
+        try {
+            // Create new Gantt chart for this user
+            new Gantt(container, ganttTasks, {
+                view_mode: this.ganttViewMode,
+                date_format: 'YYYY-MM-DD',
+                custom_popup_html: (task) => {
+                    const taskData = this.tasks.find(t => t.id === task.id);
+                    return `
+                        <div class="gantt-popup">
+                            <h3>${task.name}</h3>
+                            ${taskData.userName ? `<p><strong>User:</strong> ${taskData.userName}</p>` : ''}
+                            ${taskData.assignee ? `<p><strong>Assignee:</strong> ${taskData.assignee}</p>` : ''}
+                            <p><strong>Status:</strong> ${taskData.status}</p>
+                            <p><strong>Duration:</strong> ${task.start} - ${task.end}</p>
+                            ${taskData.description ? `<p><strong>Description:</strong> ${taskData.description}</p>` : ''}
+                        </div>
+                    `;
+                },
+                on_click: (task) => {
+                    // Optional: handle task click
+                },
+                on_date_change: async (task, start, end) => {
+                    // Update task dates in Firestore
+                    try {
+                        await db.collection('tasks').doc(task.id).update({
+                            startDate: start.toISOString().split('T')[0],
+                            endDate: end.toISOString().split('T')[0],
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (error) {
+                        console.error('Error updating task dates:', error);
+                        alert('Error updating task dates');
+                    }
+                },
+                on_progress_change: async (task, progress) => {
+                    // Update task progress/status
+                    let status = 'Not Started';
+                    if (progress >= 100) status = 'Completed';
+                    else if (progress > 0) status = 'In Progress';
+                    
+                    try {
+                        await db.collection('tasks').doc(task.id).update({
+                            status,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (error) {
+                        console.error('Error updating task status:', error);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error rendering Gantt chart for user:', error);
+            container.innerHTML = '<p style="text-align: center; color: #c33; padding: 20px;">Error rendering Gantt chart.</p>';
+        }
+    }
+
+    renderStandardGantt(container) {
         // Convert tasks to Gantt format
         const ganttTasks = this.tasks.map(task => ({
             id: task.id,

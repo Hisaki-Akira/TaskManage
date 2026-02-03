@@ -473,6 +473,42 @@ button {
     margin-top: 20px;
 }
 
+.gantt-user-section {
+    margin-bottom: 30px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.gantt-user-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gantt-user-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.gantt-user-header .task-count {
+    font-size: 14px;
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.gantt-user-container {
+    padding: 15px;
+    background: #fafafa;
+    min-height: 100px;
+}
+
 .gantt-container {
     overflow-x: auto;
 }
