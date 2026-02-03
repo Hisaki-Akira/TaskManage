@@ -200,13 +200,14 @@ class TaskManager {
         
         const taskId = document.getElementById('task-id').value;
         const title = document.getElementById('task-title').value.trim();
+        const userName = document.getElementById('task-user-name').value.trim();
         const assignee = document.getElementById('task-assignee').value.trim();
         const startDate = document.getElementById('task-start-date').value;
         const endDate = document.getElementById('task-end-date').value;
         const status = document.getElementById('task-status').value;
         const description = document.getElementById('task-description').value.trim();
 
-        if (!title || !startDate || !endDate) {
+        if (!title || !userName || !startDate || !endDate) {
             alert('Please fill in all required fields');
             return;
         }
@@ -221,6 +222,7 @@ class TaskManager {
 
         const taskData = {
             title,
+            userName: userName || '',
             assignee: assignee || '',
             startDate,
             endDate,
@@ -256,6 +258,7 @@ class TaskManager {
         
         document.getElementById('task-id').value = taskId;
         document.getElementById('task-title').value = task.title;
+        document.getElementById('task-user-name').value = task.userName || '';
         document.getElementById('task-assignee').value = task.assignee || '';
         document.getElementById('task-start-date').value = task.startDate;
         document.getElementById('task-end-date').value = task.endDate;
@@ -329,6 +332,7 @@ class TaskManager {
                     return `
                         <div class="gantt-popup">
                             <h3>${task.name}</h3>
+                            ${taskData.userName ? `<p><strong>User:</strong> ${taskData.userName}</p>` : ''}
                             ${taskData.assignee ? `<p><strong>Assignee:</strong> ${taskData.assignee}</p>` : ''}
                             <p><strong>Status:</strong> ${taskData.status}</p>
                             <p><strong>Duration:</strong> ${task.start} - ${task.end}</p>
@@ -429,6 +433,7 @@ class TaskManager {
                     </div>
                 </div>
                 <div class="task-item-details">
+                    ${task.userName ? `<div class="task-item-detail"><strong>User:</strong> ${this.escapeHtml(task.userName)}</div>` : ''}
                     ${task.assignee ? `<div class="task-item-detail"><strong>Assignee:</strong> ${this.escapeHtml(task.assignee)}</div>` : ''}
                     <div class="task-item-detail"><strong>Start Date:</strong> ${task.startDate}</div>
                     <div class="task-item-detail"><strong>End Date:</strong> ${task.endDate}</div>
