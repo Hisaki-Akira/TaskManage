@@ -57,6 +57,14 @@
                 </button>
             </div>
 
+            <!-- Next Tasks Panel -->
+            <div id="next-tasks-panel" class="next-tasks-panel">
+                <h3>🎯 次に取り組むタスク</h3>
+                <div id="next-tasks-list" class="next-tasks-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
             <!-- Gantt Chart View -->
             <div id="gantt-view" class="gantt-view">
                 <div class="view-header">
@@ -138,6 +146,14 @@
                     <div class="form-group">
                         <label for="task-description">説明</label>
                         <textarea id="task-description" rows="3" placeholder="タスクの詳細..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-dependencies">依存タスク（このタスクを開始する前に完了すべきタスク）</label>
+                        <select id="task-dependencies" multiple size="4">
+                            <!-- Populated dynamically -->
+                        </select>
+                        <small class="form-help">Ctrl/Cmd + クリックで複数選択</small>
                     </div>
                     
                     <div class="form-actions">

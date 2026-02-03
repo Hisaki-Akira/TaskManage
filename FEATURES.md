@@ -280,7 +280,6 @@ Complete feature list for the Task Manager application.
 While not currently implemented, the application could be extended with:
 - Task comments and discussions
 - File attachments
-- Task dependencies
 - Notifications
 - Export to PDF/Excel
 - Task templates
@@ -290,6 +289,38 @@ While not currently implemented, the application could be extended with:
 - Activity log/history
 - Dark mode theme
 - Multiple projects/boards
+
+## 📊 Task Scheduling Features (NEW!)
+
+### Dependency Management
+- **Task Dependencies**: Define prerequisite tasks that must complete before a task can start
+- **Dependency Visualization**: Arrows in Gantt chart showing dependency relationships
+- **Circular Dependency Prevention**: System validates and prevents circular dependencies
+- **Smart Date Validation**: Warns if tasks start before dependencies complete
+
+### Next Tasks Panel
+- **🎯 Next Tasks View**: Dedicated panel showing tasks ready to work on
+- **Smart Filtering**: Automatically identifies tasks with all dependencies completed
+- **Bottleneck Indicators**: Shows how many tasks are blocked by each next task
+- **One-Click Access**: Click any next task to open and edit it
+
+### Blocked Task Indicators
+- **Visual Blocking**: Tasks with incomplete dependencies are visually dimmed
+- **Block Icon**: 🔒 icon appears on blocked tasks in Gantt chart
+- **Dependency Status**: Popup shows which dependencies are completed (✓) or pending (⏳)
+- **Blocking Count**: See how many other tasks each task blocks
+
+### Schedule Impact Visualization
+- **Auto-Update Cascade**: When a task's end date changes, dependent tasks automatically shift
+- **Impact Preview**: Warning dialog shows suggested start dates based on dependencies
+- **Real-Time Updates**: All users see schedule changes immediately
+- **Dependency Lines**: Visual arrows connecting tasks show impact paths
+
+### Enhanced Task Details
+- **Dependency List**: View all prerequisite tasks in popup and list view
+- **Dependent Tasks Count**: See how many tasks depend on completion of current task
+- **Status Indicators**: Clear visual feedback on dependency completion status
+- **Next Task Highlighting**: Tasks ready to work on pulse with visual emphasis
 
 ## 📦 What's Included
 
