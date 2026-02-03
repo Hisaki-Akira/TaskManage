@@ -2,12 +2,13 @@
 // Replace these values with your actual Firebase project configuration
 // To get your config, go to: Firebase Console > Project Settings > General > Your apps
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBsds2IcVAhfpUMjT97ugPTqmAAKnakb8o",
+    authDomain: "taskmanager-c551e.firebaseapp.com",
+    projectId: "taskmanager-c551e",
+    storageBucket: "taskmanager-c551e.firebasestorage.app",
+    messagingSenderId: "292117813244",
+    appId: "1:292117813244:web:27e35b9f7734a34bf74479",
+    measurementId: "G-CB5GZK566C"
 };
 
 // Initialize Firebase
