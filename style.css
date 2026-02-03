@@ -690,3 +690,338 @@ button {
 .mt-20 {
     margin-top: 20px;
 }
+
+/* Dependencies in Modal */
+.dependencies-list {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background: #fafafa;
+}
+
+.dependencies-help {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.dependency-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dependency-item:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.dependency-checkbox {
+    margin-right: 10px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.dependency-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dependency-title {
+    font-weight: 500;
+    color: #333;
+}
+
+.dependency-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 12px;
+}
+
+.dependency-status {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.dependency-dates {
+    color: #666;
+}
+
+.dependency-warning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.no-dependencies {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Next Tasks Panel */
+.next-tasks-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.next-tasks-panel h3 {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.next-tasks-list {
+    display: grid;
+    gap: 12px;
+}
+
+.next-task-card {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.next-task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.next-task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.next-task-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    flex: 1;
+}
+
+.next-task-badge {
+    background: #27ae60;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.next-task-info {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #666;
+    flex-wrap: wrap;
+}
+
+.next-task-info-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.no-next-tasks {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Task State Indicators */
+.task-state-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 8px;
+}
+
+.task-state-ready {
+    background: #27ae60;
+    color: white;
+}
+
+.task-state-blocked {
+    background: #e74c3c;
+    color: white;
+}
+
+.task-state-in-progress {
+    background: #3498db;
+    color: white;
+}
+
+.task-state-critical {
+    background: #f39c12;
+    color: white;
+}
+
+/* Dependency Visualization */
+.gantt .bar-next-task {
+    fill: #27ae60;
+    stroke: #1e8449;
+    stroke-width: 2;
+}
+
+.gantt .bar-critical-path {
+    fill: #e74c3c;
+    stroke: #c0392b;
+    stroke-width: 2;
+}
+
+.gantt .bar-blocked {
+    fill: #95a5a6;
+    opacity: 0.6;
+}
+
+.gantt .bar-ready {
+    fill: #27ae60;
+}
+
+/* Blocked Task Indicator */
+.task-blocked-indicator {
+    background: #fee;
+    border-left: 4px solid #e74c3c;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.task-blocked-title {
+    font-weight: 600;
+    color: #e74c3c;
+    margin-bottom: 5px;
+}
+
+.blocking-tasks-list {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+.blocking-tasks-list li {
+    padding: 5px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Schedule Impact Warning */
+.schedule-impact-warning {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 4px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.schedule-impact-title {
+    font-weight: 600;
+    color: #856404;
+    margin-bottom: 8px;
+}
+
+.affected-tasks-list {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+.affected-tasks-list li {
+    padding: 5px 0;
+    font-size: 13px;
+    color: #856404;
+}
+
+/* Dependency Lines (for future enhancement with canvas/svg) */
+.dependency-line {
+    stroke: #667eea;
+    stroke-width: 2;
+    fill: none;
+    marker-end: url(#arrowhead);
+}
+
+.dependency-line-critical {
+    stroke: #e74c3c;
+    stroke-width: 3;
+}
+
+/* Enhanced Task Cards in List View */
+.task-dependencies-info {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.task-dependencies-info strong {
+    color: #667eea;
+}
+
+.task-dependency-tag {
+    display: inline-block;
+    background: #f0f0f0;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-top: 5px;
+    color: #666;
+}
+
+.task-dependency-tag.completed {
+    background: #d5f4e6;
+    color: #27ae60;
+}
+
+.task-dependency-tag.pending {
+    background: #fee;
+    color: #e74c3c;
+}

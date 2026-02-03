@@ -6,6 +6,12 @@ A web-based task management tool with Gantt chart visualization, built for FTC m
 
 - 🔐 **Authentication**: Email/Password authentication via Firebase
 - 📊 **User-Grouped Gantt Chart**: Interactive Gantt chart with tasks grouped by user vertically
+- 🎯 **Smart Scheduling**: Next task recommendations based on dependencies and dates
+- 🔗 **Task Dependencies**: Link tasks with prerequisite relationships
+- 🛣️ **Critical Path**: Automatic detection and highlighting of critical path tasks
+- ⚠️ **Schedule Impact**: Visual warnings when task changes affect other tasks
+- 📌 **Next Tasks Panel**: Dedicated panel showing ready-to-work tasks
+- 🚦 **Task States**: Visual indicators for Ready, Blocked, In Progress, and Critical Path
 - 🎯 **Modal Task Creation**: Quick and easy task creation via modal dialog
 - 📝 **Task Management**: Create, edit, and delete tasks with full CRUD operations
 - 👥 **Multi-user Access**: All authenticated users can read and write tasks
@@ -147,6 +153,42 @@ https://hisaki-akira.github.io/TaskManage/
 
 ## Usage Guide
 
+### Scheduling & Planning Features
+
+#### Next Tasks Panel
+At the top of the Gantt view, you'll see a purple panel showing tasks that are ready to work on:
+- **Ready Tasks**: Tasks with all dependencies completed and start date reached
+- Shows task details: assignee, dates, and dependency count
+- Click any card to quickly edit the task
+- Updates automatically as tasks progress
+
+#### Task Dependencies
+When creating or editing a task:
+1. Scroll to the "依存タスク" (Dependencies) section
+2. Check the boxes for tasks that must complete first
+3. The system prevents circular dependencies automatically
+4. Dependencies show with status indicators (completed = green, pending = red)
+
+#### Visual Indicators
+Tasks are marked with color-coded badges:
+- 🟢 **準備完了** (Ready): All dependencies done, ready to start
+- 🟢 **次のタスク** (Next Task): Recommended to work on now
+- 🔴 **ブロック中** (Blocked): Waiting on dependencies
+- 🟠 **クリティカルパス** (Critical Path): On the longest dependency chain
+
+#### Schedule Impact Warnings
+When you drag a task to change its dates:
+- A warning appears showing affected downstream tasks
+- Helps you understand the impact of schedule changes
+- Auto-dismisses after 10 seconds
+
+#### Gantt Chart Enhancements
+- Dependency lines connect related tasks (via Frappe Gantt)
+- Next tasks highlighted in bright green
+- Critical path tasks highlighted in red
+- Blocked tasks shown with reduced opacity
+- Click any task to see its dependencies and blocking status
+
 ### Creating a Task
 
 1. Click the "➕ Add Task" button at the top of the page
@@ -158,6 +200,7 @@ https://hisaki-akira.github.io/TaskManage/
    - **End Date**: When the task should be completed (required)
    - **Status**: Current task status
    - **Description**: Additional details about the task
+   - **Dependencies**: Select tasks that must be completed first (optional)
 
 3. Click "Create Task" to add the task
 4. The modal will close automatically upon successful creation

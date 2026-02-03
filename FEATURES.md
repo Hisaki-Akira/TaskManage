@@ -28,12 +28,15 @@ Complete feature list for the Task Manager application.
 - End date (required)
 - Status selection
 - Description field
+- Dependencies selection (choose prerequisite tasks)
 - Automatic timestamps (createdAt, updatedAt)
+- Circular dependency detection
 
 ### Edit Tasks
 - Click-to-edit from list view
 - All fields can be modified
 - Form pre-population
+- Dependencies can be updated
 - Cancel option to discard changes
 - Automatic update timestamps
 
@@ -56,6 +59,7 @@ Complete feature list for the Task Manager application.
 - Task progress indication
 - Drag-and-drop to reschedule
 - Adjustable progress bars
+- Dependency lines between tasks
 
 ### View Modes
 - **Day View**: Hourly timeline
@@ -67,14 +71,22 @@ Complete feature list for the Task Manager application.
 - Color-coded status:
   - Gray: Not Started
   - Blue: In Progress
-  - Green: Completed
+  - Green: Completed / Next Task / Ready
   - Orange: On Hold
+  - Red: Critical Path / Blocked
 - Task bars show duration
 - Progress bars show completion percentage
+- Dependency arrows connect related tasks
+- "Next Task" highlighting in green
+- "Critical Path" highlighting in red
+- "Blocked" indicators with opacity
 
 ### Task Details Popup
 - Click any task to see details
 - Shows title, assignee, status, dates, description
+- Shows dependencies with their status
+- Shows state badges (Next Task, Critical Path, Blocked, Ready)
+- Shows blocking tasks if task is blocked
 - Hover for quick info
 - Non-blocking popup
 
@@ -83,21 +95,77 @@ Complete feature list for the Task Manager application.
 - Visual feedback during drag
 - Automatic date validation
 - Updates Firestore in real-time
+- Shows schedule impact warnings for affected downstream tasks
 
 ## 📋 List View Features
 
 ### Detailed Task Cards
 - All task information visible
 - Status badges with color coding
+- State indicators (Next Task, Critical Path, Blocked, Ready)
 - Assignee information
 - Date range display
 - Full description text
+- Dependencies display with status tags
+- Color-coded dependency tags (green for completed, red for pending)
 
 ### Task Actions
 - Edit button on each task
 - Delete button with confirmation
 - Quick access to all operations
 - Responsive layout
+
+## 🎯 Scheduling & Planning Features
+
+### Next Task Indicator
+- Dedicated "Next Tasks" panel at top of Gantt view
+- Shows tasks ready to work on based on:
+  - All dependencies completed
+  - Start date is today or in the past
+  - Task not already completed or on hold
+- Highlighted in green in Gantt chart
+- Clickable cards to quickly edit tasks
+- Shows task count and dependency information
+- Updates in real-time
+
+### Task Dependencies
+- Select prerequisite tasks when creating/editing
+- Visual dependency list with status indicators
+- Dependency lines in Gantt chart (via Frappe Gantt)
+- Circular dependency detection and prevention
+- Shows which tasks block current task
+- Color-coded dependency tags:
+  - Green: Completed dependencies
+  - Red: Pending dependencies
+
+### Task States
+- **Ready**: All dependencies completed, ready to start
+- **Blocked**: Has uncompleted dependencies
+- **In Progress**: Currently being worked on
+- **Critical Path**: On the longest dependency chain
+- Visual badges show state at a glance
+
+### Critical Path Detection
+- Automatically calculates critical path
+- Highlights critical tasks in red
+- Shows longest dependency chain
+- Helps identify bottlenecks
+- Updates automatically as tasks complete
+
+### Schedule Impact Analysis
+- Detects when task dates change
+- Identifies affected downstream tasks
+- Shows warning notification with list of impacted tasks
+- Helps understand scheduling decisions
+- Auto-dismisses after 10 seconds
+- Prevents cascading schedule issues
+
+### Bottleneck Indicators
+- "Blocked by" information in task popups
+- Lists specific tasks causing blocks
+- Shows status of blocking tasks
+- Helps prioritize work
+- Visual indicators in both Gantt and list views
 
 ## 🔄 Real-time Collaboration
 
@@ -280,16 +348,16 @@ Complete feature list for the Task Manager application.
 While not currently implemented, the application could be extended with:
 - Task comments and discussions
 - File attachments
-- Task dependencies
 - Notifications
 - Export to PDF/Excel
 - Task templates
 - Custom fields
-- Filtering and search
+- Advanced filtering and search
 - User roles and permissions
 - Activity log/history
 - Dark mode theme
 - Multiple projects/boards
+- Gantt chart printing
 
 ## 📦 What's Included
 
