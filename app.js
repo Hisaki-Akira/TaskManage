@@ -8,6 +8,7 @@ class TaskManager {
         this.ganttViewMode = 'Week';
         this.editingTaskId = null;
         this.unsubscribeSnapshot = null;
+        this.UNASSIGNED_USER = 'Unassigned';
         
         this.init();
     }
@@ -147,6 +148,22 @@ class TaskManager {
         }
     }
 
+    openTaskModal() {
+        this.resetForm();
+        document.getElementById('task-modal').classList.remove('hidden');
+        document.getElementById('modal-title').textContent = 'Create New Task';
+        document.getElementById('submit-btn').textContent = 'Create Task';
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeTaskModal() {
+        document.getElementById('task-modal').classList.add('hidden');
+        this.resetForm();
+        // Restore body scroll
+        document.body.style.overflow = '';
+    }
+
     toggleView() {
         const ganttView = document.getElementById('gantt-view');
         const listView = document.getElementById('list-view');
@@ -200,13 +217,14 @@ class TaskManager {
         
         const taskId = document.getElementById('task-id').value;
         const title = document.getElementById('task-title').value.trim();
+        const userName = document.getElementById('task-user-name').value.trim();
         const assignee = document.getElementById('task-assignee').value.trim();
         const startDate = document.getElementById('task-start-date').value;
         const endDate = document.getElementById('task-end-date').value;
         const status = document.getElementById('task-status').value;
         const description = document.getElementById('task-description').value.trim();
 
-        if (!title || !startDate || !endDate) {
+        if (!title || !userName || !startDate || !endDate) {
             alert('Please fill in all required fields');
             return;
         }
@@ -221,6 +239,7 @@ class TaskManager {
 
         const taskData = {
             title,
+            userName,
             assignee: assignee || '',
             startDate,
             endDate,
@@ -239,7 +258,7 @@ class TaskManager {
                 await db.collection('tasks').add(taskData);
             }
             
-            this.resetForm();
+            this.closeTaskModal();
             this.showLoading(false);
         } catch (error) {
             console.error('Error saving task:', error);
@@ -256,17 +275,19 @@ class TaskManager {
         
         document.getElementById('task-id').value = taskId;
         document.getElementById('task-title').value = task.title;
+        document.getElementById('task-user-name').value = task.userName || '';
         document.getElementById('task-assignee').value = task.assignee || '';
         document.getElementById('task-start-date').value = task.startDate;
         document.getElementById('task-end-date').value = task.endDate;
         document.getElementById('task-status').value = task.status;
         document.getElementById('task-description').value = task.description || '';
         
-        document.getElementById('form-title').textContent = 'Edit Task';
+        document.getElementById('modal-title').textContent = 'Edit Task';
         document.getElementById('submit-btn').textContent = 'Update Task';
         
-        // Scroll to form
-        document.querySelector('.task-form-container').scrollIntoView({ behavior: 'smooth' });
+        // Open modal
+        document.getElementById('task-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
     }
 
     async deleteTask(taskId) {
@@ -285,15 +306,11 @@ class TaskManager {
         }
     }
 
-    cancelEdit() {
-        this.resetForm();
-    }
-
     resetForm() {
         this.editingTaskId = null;
         document.getElementById('task-form').reset();
         document.getElementById('task-id').value = '';
-        document.getElementById('form-title').textContent = 'Create New Task';
+        document.getElementById('modal-title').textContent = 'Create New Task';
         document.getElementById('submit-btn').textContent = 'Create Task';
     }
 
@@ -306,6 +323,128 @@ class TaskManager {
             return;
         }
 
+        // Group tasks by userName
+        const tasksByUser = this.groupTasksByUser();
+        
+        // If we have users, render grouped view; otherwise fallback to standard view
+        if (Object.keys(tasksByUser).length > 0) {
+            this.renderUserGroupedGantt(container, tasksByUser);
+        } else {
+            this.renderStandardGantt(container);
+        }
+    }
+
+    groupTasksByUser() {
+        const tasksByUser = {};
+        this.tasks.forEach(task => {
+            const userName = task.userName || this.UNASSIGNED_USER;
+            if (!tasksByUser[userName]) {
+                tasksByUser[userName] = [];
+            }
+            tasksByUser[userName].push(task);
+        });
+        return tasksByUser;
+    }
+
+    renderUserGroupedGantt(container, tasksByUser) {
+        container.innerHTML = '';
+        
+        // Create a container for each user
+        const users = Object.keys(tasksByUser).sort();
+        users.forEach(userName => {
+            const userSection = document.createElement('div');
+            userSection.className = 'gantt-user-section';
+            
+            const userHeader = document.createElement('div');
+            userHeader.className = 'gantt-user-header';
+            userHeader.innerHTML = `<h3>${this.escapeHtml(userName)}</h3><span class="task-count">${tasksByUser[userName].length} task(s)</span>`;
+            userSection.appendChild(userHeader);
+            
+            const userGanttContainer = document.createElement('div');
+            userGanttContainer.className = 'gantt-user-container';
+            userGanttContainer.id = `gantt-user-${this.sanitizeId(userName)}`;
+            userSection.appendChild(userGanttContainer);
+            
+            container.appendChild(userSection);
+            
+            // Render Gantt chart for this user's tasks
+            this.renderGanttForUser(userGanttContainer, tasksByUser[userName]);
+        });
+    }
+
+    sanitizeId(str) {
+        // Replace any character that's not alphanumeric, hyphen, or underscore with hyphen
+        return str.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/--+/g, '-');
+    }
+
+    renderGanttForUser(container, tasks) {
+        // Convert tasks to Gantt format
+        const ganttTasks = tasks.map(task => ({
+            id: task.id,
+            name: task.title,
+            start: task.startDate,
+            end: task.endDate,
+            progress: this.getProgressFromStatus(task.status),
+            custom_class: this.getStatusClass(task.status)
+        }));
+
+        try {
+            // Create new Gantt chart for this user
+            new Gantt(container, ganttTasks, {
+                view_mode: this.ganttViewMode,
+                date_format: 'YYYY-MM-DD',
+                custom_popup_html: (task) => {
+                    const taskData = this.tasks.find(t => t.id === task.id);
+                    return `
+                        <div class="gantt-popup">
+                            <h3>${task.name}</h3>
+                            ${taskData.userName ? `<p><strong>User:</strong> ${taskData.userName}</p>` : ''}
+                            ${taskData.assignee ? `<p><strong>Assignee:</strong> ${taskData.assignee}</p>` : ''}
+                            <p><strong>Status:</strong> ${taskData.status}</p>
+                            <p><strong>Duration:</strong> ${task.start} - ${task.end}</p>
+                            ${taskData.description ? `<p><strong>Description:</strong> ${taskData.description}</p>` : ''}
+                        </div>
+                    `;
+                },
+                on_click: (task) => {
+                    // Optional: handle task click
+                },
+                on_date_change: async (task, start, end) => {
+                    // Update task dates in Firestore
+                    try {
+                        await db.collection('tasks').doc(task.id).update({
+                            startDate: start.toISOString().split('T')[0],
+                            endDate: end.toISOString().split('T')[0],
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (error) {
+                        console.error('Error updating task dates:', error);
+                        alert('Error updating task dates');
+                    }
+                },
+                on_progress_change: async (task, progress) => {
+                    // Update task progress/status
+                    let status = 'Not Started';
+                    if (progress >= 100) status = 'Completed';
+                    else if (progress > 0) status = 'In Progress';
+                    
+                    try {
+                        await db.collection('tasks').doc(task.id).update({
+                            status,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (error) {
+                        console.error('Error updating task status:', error);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error rendering Gantt chart for user:', error);
+            container.innerHTML = '<p style="text-align: center; color: #c33; padding: 20px;">Error rendering Gantt chart.</p>';
+        }
+    }
+
+    renderStandardGantt(container) {
         // Convert tasks to Gantt format
         const ganttTasks = this.tasks.map(task => ({
             id: task.id,
@@ -329,6 +468,7 @@ class TaskManager {
                     return `
                         <div class="gantt-popup">
                             <h3>${task.name}</h3>
+                            ${taskData.userName ? `<p><strong>User:</strong> ${taskData.userName}</p>` : ''}
                             ${taskData.assignee ? `<p><strong>Assignee:</strong> ${taskData.assignee}</p>` : ''}
                             <p><strong>Status:</strong> ${taskData.status}</p>
                             <p><strong>Duration:</strong> ${task.start} - ${task.end}</p>
@@ -429,6 +569,7 @@ class TaskManager {
                     </div>
                 </div>
                 <div class="task-item-details">
+                    ${task.userName ? `<div class="task-item-detail"><strong>User:</strong> ${this.escapeHtml(task.userName)}</div>` : ''}
                     ${task.assignee ? `<div class="task-item-detail"><strong>Assignee:</strong> ${this.escapeHtml(task.assignee)}</div>` : ''}
                     <div class="task-item-detail"><strong>Start Date:</strong> ${task.startDate}</div>
                     <div class="task-item-detail"><strong>End Date:</strong> ${task.endDate}</div>
