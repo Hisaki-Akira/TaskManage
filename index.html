@@ -50,6 +50,17 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Next Up Panel -->
+            <div id="next-up-panel" class="next-up-panel hidden">
+                <div class="next-up-header">
+                    <h3>🎯 次のタスク</h3>
+                    <button onclick="app.dismissNextUp()" class="btn-dismiss">×</button>
+                </div>
+                <div id="next-up-content" class="next-up-content">
+                    <!-- Next task will be rendered here -->
+                </div>
+            </div>
+
             <!-- Add Task Button -->
             <div class="add-task-button-container">
                 <button onclick="app.openTaskModal()" class="btn-primary btn-add-task">
@@ -138,6 +149,16 @@
                     <div class="form-group">
                         <label for="task-description">説明</label>
                         <textarea id="task-description" rows="3" placeholder="タスクの詳細..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-dependencies">依存タスク（このタスクの前に完了すべきタスク）</label>
+                        <select id="task-dependencies" multiple size="4">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                        <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                            Ctrl/Cmd + クリックで複数選択できます
+                        </small>
                     </div>
                     
                     <div class="form-actions">
