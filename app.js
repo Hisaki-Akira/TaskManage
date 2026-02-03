@@ -10,6 +10,11 @@ class TaskManager {
         this.unsubscribeSnapshot = null;
         this.UNASSIGNED_USER = '未割り当て';
         
+        // Cache for expensive calculations
+        this.cachedNextTaskIds = [];
+        this.cachedCriticalPathIds = [];
+        this.cacheValid = false;
+        
         this.init();
     }
 
@@ -267,6 +272,9 @@ class TaskManager {
                     });
                 });
                 
+                // Invalidate cache when tasks change
+                this.cacheValid = false;
+                
                 this.renderGanttChart();
                 if (this.currentView === 'list') {
                     this.renderTaskList();
@@ -416,6 +424,27 @@ class TaskManager {
     }
 
     // Dependency and scheduling methods
+    updateSchedulingCache() {
+        // Only recalculate if cache is invalid
+        if (this.cacheValid) {
+            return;
+        }
+        
+        this.cachedNextTaskIds = this.calculateNextTasks().map(t => t.id);
+        this.cachedCriticalPathIds = this.calculateCriticalPath();
+        this.cacheValid = true;
+    }
+
+    getNextTaskIds() {
+        this.updateSchedulingCache();
+        return this.cachedNextTaskIds;
+    }
+
+    getCriticalPathIds() {
+        this.updateSchedulingCache();
+        return this.cachedCriticalPathIds;
+    }
+
     isTaskReady(task) {
         // A task is ready if all its dependencies are completed
         if (!task.dependencies || task.dependencies.length === 0) {
@@ -675,9 +704,9 @@ class TaskManager {
     }
 
     renderGanttForUser(container, tasks) {
-        // Calculate next tasks and critical path
-        const nextTaskIds = this.calculateNextTasks().map(t => t.id);
-        const criticalPathIds = this.calculateCriticalPath();
+        // Use cached calculations
+        const nextTaskIds = this.getNextTaskIds();
+        const criticalPathIds = this.getCriticalPathIds();
         
         // Convert tasks to Gantt format
         const ganttTasks = tasks.map(task => {
@@ -965,8 +994,9 @@ class TaskManager {
             return;
         }
 
-        const nextTaskIds = this.calculateNextTasks().map(t => t.id);
-        const criticalPathIds = this.calculateCriticalPath();
+        // Use cached calculations
+        const nextTaskIds = this.getNextTaskIds();
+        const criticalPathIds = this.getCriticalPathIds();
 
         container.innerHTML = this.tasks.map(task => {
             const isNextTask = nextTaskIds.includes(task.id);
